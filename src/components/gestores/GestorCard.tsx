@@ -91,13 +91,13 @@ export default function GestorCard({ gestor }: { gestor: GestorProfile }) {
           {gestor.platforms.slice(0, 3).map((p) => (
             <span
               key={p}
-              className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[12px] font-medium"
+              className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[12px] font-medium text-slate-700 dark:text-slate-300"
             >
               {getPlatformLabel(p)}
             </span>
           ))}
           {gestor.platforms.length > 3 && (
-            <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[12px] font-medium text-slate-500">
+            <span className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[12px] font-medium text-slate-500 dark:text-slate-400">
               +{gestor.platforms.length - 3}
             </span>
           )}

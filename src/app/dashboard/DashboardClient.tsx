@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, MessageCircle, Users, ExternalLink, Activity } from "lucide-react";
+import { Eye, MessageCircle, Users, Activity } from "lucide-react";
 import {
   AreaChart,
   Area,
@@ -10,6 +10,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useEffect, useState } from "react";
 
 // Mock data for chart
 const data = [
@@ -23,6 +24,21 @@ const data = [
 ];
 
 export default function DashboardClient({ profile, initialLeads, stats }: any) {
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsDark(document.documentElement.classList.contains("dark"));
+    check();
+    const observer = new MutationObserver(check);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
+  const gridColor = isDark ? "#1e293b" : "#e2e8f0";
+  const axisColor = isDark ? "#475569" : "#94a3b8";
+  const tooltipBg = isDark ? "#0f172a" : "#ffffff";
+  const tooltipBorder = isDark ? "#1e293b" : "#e2e8f0";
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       <div className="flex items-center justify-between">
@@ -44,8 +60,8 @@ export default function DashboardClient({ profile, initialLeads, stats }: any) {
               </p>
               <p className="text-3xl font-bold text-slate-900 dark:text-white mt-2">{stats.views}</p>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 grid place-items-center">
-              <Eye className="w-5 h-5 text-slate-500" />
+            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 dark:bg-blue-500/15 border border-blue-500/20 grid place-items-center shadow-lg shadow-blue-500/5">
+              <Eye className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             </div>
           </div>
           <div className="mt-4 flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
@@ -62,8 +78,8 @@ export default function DashboardClient({ profile, initialLeads, stats }: any) {
               </p>
               <p className="text-3xl font-bold text-slate-900 dark:text-white mt-2">{stats.whatsappClicks}</p>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 grid place-items-center">
-              <MessageCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 grid place-items-center shadow-lg shadow-emerald-500/5">
+              <MessageCircle className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
             </div>
           </div>
           <div className="mt-4 text-xs font-medium text-slate-500">
@@ -79,8 +95,8 @@ export default function DashboardClient({ profile, initialLeads, stats }: any) {
               </p>
               <p className="text-3xl font-bold text-slate-900 dark:text-white mt-2">{stats.leadsCount}</p>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-violet-50 dark:bg-violet-500/10 grid place-items-center">
-              <Users className="w-5 h-5 text-violet-600 dark:text-violet-400" />
+            <div className="w-12 h-12 rounded-2xl bg-violet-500/10 dark:bg-violet-500/15 border border-violet-500/20 grid place-items-center shadow-lg shadow-violet-500/5">
+              <Users className="w-6 h-6 text-violet-600 dark:text-violet-400" />
             </div>
           </div>
           <div className="mt-4 text-xs font-medium text-slate-500">
@@ -104,18 +120,46 @@ export default function DashboardClient({ profile, initialLeads, stats }: any) {
               <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#1e293b" stopOpacity={0.8} />
-                    <stop offset="95%" stopColor="#1e293b" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.15} />
+                    <stop offset="95%" stopColor="#7c3aed" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={12} stroke="#888888" dy={10} />
-                <YAxis axisLine={false} tickLine={false} fontSize={12} stroke="#888888" />
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <Tooltip 
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                  itemStyle={{ fontSize: '13px', fontWeight: 600 }}
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  fontSize={12} 
+                  stroke={axisColor}
+                  dy={10} 
                 />
-                <Area type="monotone" name="Visualizações" dataKey="views" stroke="#1e293b" strokeWidth={3} fillOpacity={1} fill="url(#colorViews)" />
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
+                  fontSize={12} 
+                  stroke={axisColor}
+                />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={gridColor} />
+                <Tooltip 
+                  contentStyle={{ 
+                    borderRadius: '16px', 
+                    border: `1px solid ${tooltipBorder}`, 
+                    boxShadow: '0 10px 25px -5px rgb(0 0 0 / 0.2)',
+                    padding: '8px 12px',
+                    background: tooltipBg,
+                  }}
+                  itemStyle={{ fontSize: '13px', fontWeight: 600, color: '#7c3aed' }}
+                  labelStyle={{ color: axisColor, fontSize: '12px' }}
+                />
+                <Area 
+                  type="monotone" 
+                  name="Visualizações" 
+                  dataKey="views" 
+                  stroke="#7c3aed" 
+                  strokeWidth={3} 
+                  fillOpacity={1} 
+                  fill="url(#colorViews)" 
+                  animationDuration={1500}
+                />
               </AreaChart>
             </ResponsiveContainer>
           </div>
