@@ -1,21 +1,70 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { Zap, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Zap, Mail, Lock, Eye, EyeOff, User, Phone, Loader2 } from "lucide-react";
+import { registerUser } from "../actions/register";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Form states
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
+  });
+  
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Supabase auth
-    alert(isLogin ? "Login em breve!" : "Cadastro em breve!");
+    setIsLoading(true);
+
+    try {
+      if (isLogin) {
+        // Login flow
+        const result = await signIn("credentials", {
+          email: formData.email,
+          password: formData.password,
+          redirect: false,
+        });
+
+        if (result?.error) {
+          alert("E-mail ou senha incorretos");
+        } else {
+          router.push("/dashboard");
+          router.refresh();
+        }
+      } else {
+        // Registration flow
+        const result = await registerUser(formData);
+        
+        if (result.success) {
+          alert("Conta criada com sucesso! Agora faça o login.");
+          setIsLogin(true);
+          // Limpar apenas as senhas por segurança
+          setFormData(prev => ({ ...prev, password: "", confirmPassword: "" }));
+        } else {
+          alert(result.error || "Erro ao criar conta");
+        }
+      }
+    } catch (error) {
+      alert("Ocorreu um erro inesperado");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -28,18 +77,22 @@ export default function LoginPage() {
               <Zap className="w-6 h-6 text-white" />
             </div>
             <h1 className="font-[family-name:var(--font-outfit)] text-2xl font-bold text-slate-900 dark:text-white">
-              {isLogin ? "Entrar no TrafegoHub" : "Criar conta"}
+              {isLogin ? "Entrar no TrafegoHub" : "Criar sua conta"}
             </h1>
             <p className="mt-1 text-[14px] text-slate-500">
               {isLogin
                 ? "Acesse seu painel de gestor"
-                : "Crie sua vitrine profissional grátis"}
+                : "Comece agora a captar novos leads"}
             </p>
           </div>
 
           <div className="bg-white dark:bg-slate-900 rounded-[24px] border border-slate-200 dark:border-slate-800 p-6 sm:p-8">
-            {/* Google OAuth */}
-            <button className="w-full h-11 flex items-center justify-center gap-3 rounded-xl border border-slate-200 dark:border-slate-700 font-medium text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+            {/* Google OAuth (Ficará oculto ou secundário se preferir focar em credenciais) */}
+            <button 
+              type="button"
+              onClick={() => signIn("google")}
+              className="w-full h-11 flex items-center justify-center gap-3 rounded-xl border border-slate-200 dark:border-slate-700 font-medium text-sm hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+            >
               <svg width="18" height="18" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
@@ -58,8 +111,49 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Email/password form */}
+            {/* Email/password/name/phone form */}
             <form onSubmit={handleSubmit} className="space-y-4">
+              {!isLogin && (
+                <>
+                  <div>
+                    <label className="text-[12px] font-semibold text-slate-500 uppercase tracking-wide block mb-2">
+                      Nome Completo
+                    </label>
+                    <div className="relative">
+                      <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <input
+                        name="name"
+                        type="text"
+                        value={formData.name}
+                        onChange={handleChange}
+                        required={!isLogin}
+                        placeholder="João Silva"
+                        className="w-full h-11 pl-10 pr-4 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[12px] font-semibold text-slate-500 uppercase tracking-wide block mb-2">
+                      Telefone (ID Único)
+                    </label>
+                    <div className="relative">
+                      <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <input
+                        name="phone"
+                        type="tel"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        required={!isLogin}
+                        placeholder="5511999999999"
+                        className="w-full h-11 pl-10 pr-4 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition"
+                      />
+                    </div>
+                    <p className="mt-1 text-[11px] text-slate-500">Este número não poderá ser repetido por outro usuário.</p>
+                  </div>
+                </>
+              )}
+
               <div>
                 <label className="text-[12px] font-semibold text-slate-500 uppercase tracking-wide block mb-2">
                   E-mail
@@ -67,9 +161,10 @@ export default function LoginPage() {
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
+                    name="email"
                     type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={formData.email}
+                    onChange={handleChange}
                     required
                     placeholder="seu@email.com"
                     className="w-full h-11 pl-10 pr-4 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition"
@@ -84,9 +179,10 @@ export default function LoginPage() {
                 <div className="relative">
                   <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
+                    name="password"
                     type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={formData.password}
+                    onChange={handleChange}
                     required
                     placeholder="••••••••"
                     className="w-full h-11 pl-10 pr-10 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition"
@@ -101,6 +197,26 @@ export default function LoginPage() {
                 </div>
               </div>
 
+              {!isLogin && (
+                <div>
+                  <label className="text-[12px] font-semibold text-slate-500 uppercase tracking-wide block mb-2">
+                    Confirmar Senha
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <input
+                      name="confirmPassword"
+                      type={showPassword ? "text" : "password"}
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      required={!isLogin}
+                      placeholder="••••••••"
+                      className="w-full h-11 pl-10 pr-4 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition"
+                    />
+                  </div>
+                </div>
+              )}
+
               {isLogin && (
                 <div className="text-right">
                   <a href="#" className="text-[13px] text-violet-600 dark:text-violet-400 hover:underline">
@@ -111,9 +227,14 @@ export default function LoginPage() {
 
               <button
                 type="submit"
-                className="w-full h-12 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 text-white font-semibold shadow-lg shadow-violet-600/25 hover:shadow-xl transition"
+                disabled={isLoading}
+                className="w-full h-12 flex items-center justify-center rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 text-white font-semibold shadow-lg shadow-violet-600/25 hover:shadow-xl transition disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                {isLogin ? "Entrar" : "Criar conta"}
+                {isLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  isLogin ? "Entrar" : "Criar conta"
+                )}
               </button>
             </form>
           </div>
@@ -121,7 +242,10 @@ export default function LoginPage() {
           <p className="mt-6 text-center text-[14px] text-slate-500">
             {isLogin ? "Não tem conta? " : "Já tem conta? "}
             <button
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={() => {
+                setIsLogin(!isLogin);
+                setFormData({ name: "", email: "", phone: "", password: "", confirmPassword: "" });
+              }}
               className="text-violet-600 dark:text-violet-400 font-semibold hover:underline"
             >
               {isLogin ? "Criar agora" : "Faça login"}
