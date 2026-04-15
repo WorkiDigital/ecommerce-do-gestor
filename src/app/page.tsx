@@ -25,10 +25,10 @@ export default async function Home() {
     });
     totalGestores = await prisma.profile.count();
     gestoresData = JSON.parse(JSON.stringify(featuredGestores));
-  } catch (error) {
-    console.error("Falha ao conectar no banco de dados. Exibindo dados simulados na Home.", error);
+  } catch (err) {
+    // Engole o erro silenciosamente para o Next.js não puxar a tela de erro no ambiente de dev
     totalGestores = 0;
-    gestoresData = []; // Aqui poderíamos injetar um mock, mas para exibir os empty states basta array vazio.
+    gestoresData = [];
   }
 
   return (
