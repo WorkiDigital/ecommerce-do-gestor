@@ -50,15 +50,19 @@ export async function registerUser(formData: any) {
     console.log("Criptografando senha...");
     const passwordHash = await bcrypt.hash(password, 10);
 
+    // Check if this is the first user (if so, make them ADMIN)
+    const userCount = await prisma.user.count();
+    const role = userCount === 0 ? "ADMIN" : "GESTOR";
+
     // Create the user
-    console.log("Salvando no banco de dados...");
+    console.log(`Salvando no banco de dados como ${role}...`);
     await prisma.user.create({
       data: {
         name,
         email,
         phone,
         passwordHash,
-        role: "GESTOR", // Default role
+        role,
       },
     });
 
