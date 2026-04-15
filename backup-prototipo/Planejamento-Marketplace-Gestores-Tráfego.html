@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+<!-- Playables SDK -->
+<script>// Playables SDK v1.0.0
+// Game lifecycle bridge: rAF-based game-ready detection + event communication
+(function() {
+  'use strict';
+
+  // Idempotency: skip if already initialized (e.g., server-side injection
+  // followed by client-side inject-javascript via the Bloks webview component).
+  if (window.playablesSDK) return;
+
+  var HANDLER_NAME = 'playablesGameEventHandler';
+  var ANDROID_BRIDGE_NAME = '_MetaPlayablesBridge';
+  var RAF_FRAME_THRESHOLD = 3;
+
+  var gameReadySent = false;
+  var firstInteractionSent = false;
+  var errorSent = false;
+  var frameCount = 0;
+  var originalRAF = window.requestAnimationFrame;
+
+  // --- Transport Layer ---
+
+  function hasIOSBridge() {
+    return !!(window.webkit &&
+              window.webkit.messageHandlers &&
+              window.webkit.messageHandlers[HANDLER_NAME]);
+  }
+
+  function hasAndroidBridge() {
+    return !!(window[ANDROID_BRIDGE_NAME] &&
+              typeof window[ANDROID_BRIDGE_NAME].postEvent === 'function');
+  }
+
+  function isInIframe() {
+    return !!(window.parent && window.parent !== window);
+  }
+
+  function sendEvent(eventName, payload) {
+    var message = {
+      type: eventName,
+      payload: payload || {},
+      timestamp: Date.now()
+    };
+
+    if (hasIOSBridge()) {
+      try {
+        window.webkit.messageHandlers[HANDLER_NAME].postMessage(message);
+      } catch (e) { /* ignore */ }
+      return;
+    }
+
+    if (hasAndroidBridge()) {
+    try {
+      var p = payload || {};
+      p.__secureToken = window.__fbAndroidBridgeAuthToken || '';
+      window[ANDROID_BRIDGE_NAME].postEvent(
+        eventName,
+        JSON.stringify(p)
+      );
+    } catch (e) { /* ignore */ }
+    return;
+  }
+
+    if (isInIframe()) {
+      try {
+        window.parent.postMessage(message, '*');
+      } catch (e) { /* ignore */ }
+      return;
+    }
+  }
+
+  // --- rAF Game-Ready Detection ---
+
+  function onFrame() {
+    if (gameReadySent) return;
+
+    frameCount++;
+    if (frameCount >= RAF_FRAME_THRESHOLD) {
+      gameReadySent = true;
+      sendEvent('game_ready', {
+        frame_count: frameCount,
+        detected_at: Date.now()
+      });
+      return;
+    }
+
+    originalRAF.call(window, onFrame);
+  }
+
+  if (originalRAF) {
+    window.requestAnimationFrame = function(callback) {
+      if (!gameReadySent) {
+        return originalRAF.call(window, function(timestamp) {
+          frameCount++;
+          if (frameCount >= RAF_FRAME_THRESHOLD && !gameReadySent) {
+            gameReadySent = true;
+            sendEvent('game_ready', {
+              frame_count: frameCount,
+              detected_at: Date.now()
+            });
+          }
+          callback(timestamp);
+        });
+      }
+      return originalRAF.call(window, callback);
+    };
+  }
+
+  // --- First User Interaction Detection ---
+
+  function setupFirstInteractionDetection() {
+    var events = ['touchstart', 'mousedown', 'keydown'];
+
+    function onFirstInteraction() {
+      if (firstInteractionSent) return;
+      firstInteractionSent = true;
+      sendEvent('user_interaction_start', null);
+
+      for (var i = 0; i < events.length; i++) {
+        document.removeEventListener(events[i], onFirstInteraction, true);
+      }
+    }
+
+    for (var i = 0; i < events.length; i++) {
+      document.addEventListener(events[i], onFirstInteraction, true);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupFirstInteractionDetection);
+  } else {
+    setupFirstInteractionDetection();
+  }
+
+  // --- Auto Error Capture ---
+
+  window.addEventListener('error', function(event) {
+    if (errorSent) return;
+    errorSent = true;
+    sendEvent('error', {
+      message: event.message || 'Unknown error',
+      source: event.filename || '',
+      lineno: event.lineno || 0,
+      colno: event.colno || 0,
+      auto_captured: true
+    });
+  });
+
+  window.addEventListener('unhandledrejection', function(event) {
+    if (errorSent) return;
+    errorSent = true;
+    var reason = event.reason;
+    sendEvent('error', {
+      message: (reason instanceof Error) ? reason.message : String(reason),
+      type: 'unhandled_promise_rejection',
+      auto_captured: true
+    });
+  });
+
+  // --- Public API ---
+
+  window.playablesSDK = {
+    complete: function(score) {
+      sendEvent('game_ended', {
+        score: score,
+        completed: true
+      });
+    },
+
+    error: function(message) {
+      if (errorSent) return;
+      errorSent = true;
+      sendEvent('error', {
+        message: message || 'Unknown error',
+        auto_captured: false
+      });
+    },
+
+    sendEvent: function(eventName, payload) {
+      if (!eventName || typeof eventName !== 'string') return;
+      sendEvent(eventName, payload);
+    }
+  };
+
+  // Kick off rAF detection in case no game code calls rAF immediately
+  if (originalRAF) {
+    originalRAF.call(window, onFrame);
+  }
+})();</script>
+<script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrafegoHub — Encontre o gestor de tráfego certo em 2 minutos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        display: ['Outfit', 'Inter', 'sans-serif']
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { -webkit-font-smoothing: antialiased; }
+        .glass { backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+        .gradient-text { background: linear-gradient(90deg, #7c3aed, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
+</head>
+<body class="bg-[#F7F8FC] dark:bg-[#050709] text-slate-700 dark:text-slate-300 font-sans antialiased selection:bg-violet-500/20 selection:text-violet-700 dark:selection:text-violet-300">
+    <!-- Background -->
+    <div class="fixed inset-0 -z-10 overflow-hidden">
+        <div class="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-br from-violet-400/30 to-blue-500/30 rounded-full blur-3xl dark:from-violet-900/30 dark:to-blue-900/30"></div>
+        <div class="absolute top-1/2 -left-40 w-[500px] h-[500px] bg-gradient-to-tr from-blue-400/20 to-fuchsia-400/20 rounded-full blur-3xl dark:from-blue-900/20 dark:to-fuchsia-900/20"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 border-b border-slate-200/50 dark:border-slate-800/50">
+        <div class="absolute inset-0 bg-white/70 dark:bg-slate-950/70 glass"></div>
+        <nav class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-blue-600 flex items-center justify-center shadow-lg shadow-violet-600/20">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="text-white"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <span class="font-display text-xl font-bold tracking-tight text-slate-900 dark:text-white">Trafego<span class="gradient-text">Hub</span></span>
+            </div>
+            
+            <div class="hidden md:flex items-center gap-8 text-[15px] font-medium">
+                <a href="#features" class="hover:text-violet-600 dark:hover:text-violet-400 transition">Recursos</a>
+                <a href="#gestores" class="hover:text-violet-600 dark:hover:text-violet-400 transition">Gestores</a>
+                <a href="#precos" class="hover:text-violet-600 dark:hover:text-violet-400 transition">Preços</a>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button id="themeToggle" class="w-9 h-9 grid place-items-center rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    <svg id="sun" class="w-5 h-5 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    <svg id="moon" class="w-5 h-5 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 0 008.354-5.646z"/></svg>
+                </button>
+                <a href="#cadastro" class="hidden sm:inline-flex items-center gap-2 px-4 h-9 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-sm font-semibold hover:opacity-90 transition">Entrar</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero -->
+        <section class="relative pt-16 pb-20 sm:pt-24 sm:pb-28">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="max-w-3xl mx-auto text-center">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 dark:bg-violet-500/15 border border-violet-500/20 text-[12px] font-semibold text-violet-700 dark:text-violet-300 mb-6">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        523 gestores ativos • avaliações verificadas
+                    </div>
+                    <h1 class="font-display text-[42px] sm:text-6xl lg:text-[72px] leading-[1.05] tracking-[-0.02em] font-extrabold text-slate-900 dark:text-white">
+                        Encontre o gestor de tráfego certo
+                        <span class="gradient-text block">em 2 minutos</span>
+                    </h1>
+                    <p class="mt-6 text-[17px] sm:text-lg leading-relaxed text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+                        A plataforma que conecta empresas a gestores de tráfego pago com <strong class="text-slate-900 dark:text-white font-semibold">avaliações verificadas</strong>, portfólio real e contato direto no WhatsApp. Sem taxa, sem burocracia.
+                    </p>
+                    
+                    <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
+                        <a href="#gestores" class="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 h-12 rounded-2xl bg-gradient-to-r from-violet-600 to-blue-600 text-white font-semibold shadow-lg shadow-violet-600/25 hover:shadow-xl hover:shadow-violet-600/30 hover:-translate-y-0.5 transition-all">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                            Preciso contratar
+                        </a>
+                        <a href="#cadastro" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 h-12 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+                            Quero ser encontrado
+                        </a>
+                    </div>
+
+                    <div class="mt-10 flex flex-wrap items-center justify-center gap-6 text-sm text-slate-500 dark:text-slate-400">
+                        <div class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>Sem mensalidade para empresas</div>
+                        <div class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>Contato direto</div>
+                        <div class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>LGPD</div>
+                    </div>
+                </div>
+
+                <!-- Mock search bar -->
+                <div class="mt-14 max-w-4xl mx-auto">
+                    <div class="relative group">
+                        <div class="absolute -inset-0.5 bg-gradient-to-r from-violet-600 to-blue-600 rounded-[28px] blur-xl opacity-20 group-hover:opacity-30 transition"></div>
+                        <div class="relative bg-white dark:bg-slate-900 rounded-[24px] border border-slate-200 dark:border-slate-800 shadow-2xl shadow-slate-900/10 p-2">
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <div class="flex-1 flex items-center gap-3 px-4 h-12">
+                                    <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                    <input placeholder="Buscar por nicho, cidade ou plataforma..." class="w-full bg-transparent outline-none text-[15px] placeholder-slate-400">
+                                </div>
+                                <button class="h-12 px-6 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold text-[15px] hover:opacity-90 transition">Buscar gestores</button>
+                            </div>
+                        </div>
+                    <div class="mt-4 flex flex-wrap justify-center gap-2">
+                        <button class="px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-xs font-medium hover:bg-violet-100 dark:hover:bg-violet-900/30">E-commerce</button>
+                        <button class="px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-xs font-medium hover:bg-violet-100 dark:hover:bg-violet-900/30">Infoprodutos</button>
+                        <button class="px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-xs font-medium hover:bg-violet-100 dark:hover:bg-violet-900/30">Negócio Local</button>
+                        <button class="px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-xs font-medium hover:bg-violet-100 dark:hover:bg-violet-900/30">SaaS</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section id="features" class="py-16 sm:py-24 border-t border-slate-200/60 dark:border-slate-800/60">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="max-w-2xl">
+                    <h2 class="font-display text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">Tudo que você precisa, sem enrolação</h2>
+                    <p class="mt-3 text-slate-600 dark:text-slate-400">Criamos o TrafegoHub para acabar com indicações às cegas.</p>
+                </div>
+
+                <div class="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <!-- Feature -->
+                    <div class="group relative p-[1px] rounded-3xl bg-gradient-to-b from-slate-200 to-transparent dark:from-slate-800 hover:from-violet-500/50 transition">
+                        <div class="h-full bg-white dark:bg-slate-900 rounded-[23px] p-6">
+                            <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-violet-600 to-blue-600 flex items-center justify-center shadow-lg shadow-violet-600/20 group-hover:scale-110 transition">
+                                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l2.036 6.29M11.049 2.927c.3-.921 1.603-.921 1.902 0l2.036 6.29M11.049 2.927c.3-.921 1.603-.921 1.902 0l2.036 6.29a1 1 0 00.95.69h6.631c.969 0 1.371 1.24.588 1.81l-5.37 3.905a1 1 0 00-.364 1.118l.205.631.205.631c.3.921-.755 1.688-1.54 1.118l-5.37-3.905a1 1 0 00-1.176 0l-5.37 3.905c-.784.57-1.838-.197-1.539-1.118l.205-.631.205-.631a1 1 0 00-.364-1.118L2.717 8.717c-.783-.57-.38-1.81.588-1.81h6.631a1 1 0 00.95-.69l2.036-6.29z"/></svg>
+                            </div>
+                            <h3 class="mt-5 font-semibold text-slate-900 dark:text-white">Avaliações reais</h3>
+                            <p class="mt-2 text-[14px] leading-relaxed text-slate-600 dark:text-slate-400">Apenas clientes verificados podem avaliar. Nota, comentários e comprovantes de resultado.</p>
+                        </div>
+                    </div>
+
+                    <div class="group relative p-[1px] rounded-3xl bg-gradient-to-b from-slate-200 to-transparent dark:from-slate-800 hover:from-violet-500/50 transition">
+                        <div class="h-full bg-white dark:bg-slate-900 rounded-[23px] p-6">
+                            <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg shadow-emerald-600/20 group-hover:scale-110 transition">
+                                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12.001 2.002c-5.522 0-10 4.477-10 10.001 0 1.738.44 3.372 1.206 4.796l-1.276 4.666 4.774-1.252a9.953 9.953 0 004.296.99c5.522 0 9.999-4.477 9.999-10 0-5.523-4.477-10.001-9.999-10.001zm0 18.001a7.962 7.962 0 01-4.06-1.108l-.29-.174-2.834.743.757-2.763-.189-.284a7.956 7.956 0 01-1.222-4.413c0-4.41 3.588-8 8-8s7.999 3.59 7.999 8-3.587 8-7.999 8z"/></svg>
+                            </div>
+                            <h3 class="mt-5 font-semibold text-slate-900 dark:text-white">Contato direto WhatsApp</h3>
+                            <p class="mt-2 text-[14px] leading-relaxed text-slate-600 dark:text-slate-400">Sem intermediário. Clique e fale agora com o gestor. Lead quente, sem taxa por fechamento.</p>
+                        </div>
+                    </div>
+
+                    <div class="group relative p-[1px] rounded-3xl bg-gradient-to-b from-slate-200 to-transparent dark:from-slate-800 hover:from-violet-500/50 transition">
+                        <div class="h-full bg-white dark:bg-slate-900 rounded-[23px] p-6">
+                            <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-600/20 group-hover:scale-110 transition">
+                                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"/></svg>
+                            </div>
+                            <h3 class="mt-5 font-semibold text-slate-900 dark:text-white">Filtros por nicho</h3>
+                            <p class="mt-2 text-[14px] leading-relaxed text-slate-600 dark:text-slate-400">E-commerce, infoprodutos, local, SaaS, serviços. Encontre quem já tem resultado no seu mercado.</p>
+                        </div>
+                    </div>
+
+                    <div class="group relative p-[1px] rounded-3xl bg-gradient-to-b from-slate-200 to-transparent dark:from-slate-800 hover:from-violet-500/50 transition">
+                        <div class="h-full bg-white dark:bg-slate-900 rounded-[23px] p-6">
+                            <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-fuchsia-600 to-violet-600 flex items-center justify-center shadow-lg shadow-fuchsia-600/20 group-hover:scale-110 transition">
+                                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 11l5 5m0-5l-5 5M4 11l5-5m0 5l-5-5M9 21h6a2 2 0 002-2v-1H7v1a2 2 0 002 2zM7 8h10l1 3H6l1-3z"/></svg>
+                            </div>
+                            <h3 class="mt-5 font-semibold text-slate-900 dark:text-white">SEO para gestores</h3>
+                            <p class="mt-2 text-[14px] leading-relaxed text-slate-600 dark:text-slate-400">Seu perfil rankeia no Google para "gestor de tráfego + cidade". Receba clientes orgânicos todo mês.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Como funciona -->
+        <section class="py-16 sm:py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <!-- Para empresas -->
+                    <div class="relative overflow-hidden rounded-[32px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 sm:p-10">
+                        <div class="absolute -top-20 -right-20 w-60 h-60 bg-blue-500/10 rounded-full blur-3xl"></div>
+                        <div class="relative">
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-700 dark:text-blue-300 text-xs font-semibold">Para Empresas</div>
+                            <h3 class="mt-4 font-display text-[28px] font-bold text-slate-900 dark:text-white">Contrate em 3 passos</h3>
+                            <div class="mt-8 space-y-6">
+                                <div class="flex gap-4">
+                                    <div class="w-8 h-8 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 grid place-items-center text-sm font-bold shrink-0 mt-0.5">1</div>
+                                    <div><p class="font-semibold text-slate-900 dark:text-white">Busque e filtre</p><p class="text-[14px] text-slate-600 dark:text-slate-400 mt-1">Por nicho, orçamento, plataforma (Meta, Google) e localização.</p></div>
+                                </div>
+                                <div class="flex gap-4">
+                                    <div class="w-8 h-8 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 grid place-items-center text-sm font-bold shrink-0 mt-0.5">2</div>
+                                    <div><p class="font-semibold text-slate-900 dark:text-white">Compare avaliações</p><p class="text-[14px] text-slate-600 dark:text-slate-400 mt-1">Veja cases reais, investimentos gerenciados e feedbacks verificados.</p></div>
+                                </div>
+                                <div class="flex gap-4">
+                                    <div class="w-8 h-8 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 grid place-items-center text-sm font-bold shrink-0 mt-0.5">3</div>
+                                    <div><p class="font-semibold text-slate-900 dark:text-white">Feche no WhatsApp</p><p class="text-[14px] text-slate-600 dark:text-slate-400 mt-1">Clique no botão e contrate direto. 100% gratuito para você.</p></div>
+                                </div>
+                            </div>
+                            <a href="#gestores" class="mt-8 inline-flex h-11 px-5 items-center rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold text-sm hover:opacity-90">Ver gestores agora</a>
+                        </div>
+                    </div>
+
+                    <!-- Para gestores -->
+                    <div class="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-violet-600 to-blue-600 p-8 sm:p-10 text-white">
+                        <div class="absolute -bottom-20 -left-20 w-60 h-60 bg-white/10 rounded-full blur-3xl"></div>
+                        <div class="relative">
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-white text-xs font-semibold backdrop-blur">Para Gestores</div>
+                            <h3 class="mt-4 font-display text-[28px] font-bold">Seja encontrado todos os dias</h3>
+                            <div class="mt-8 space-y-6">
+                                <div class="flex gap-4">
+                                    <div class="w-8 h-8 rounded-xl bg-white text-violet-700 grid place-items-center text-sm font-bold shrink-0 mt-0.5">1</div>
+                                    <div><p class="font-semibold">Crie seu perfil em 3 min</p><p class="text-[14px] text-violet-100 mt-1">Adicione nichos, plataformas, cases e seu WhatsApp.</p></div>
+                                </div>
+                                <div class="flex gap-4">
+                                    <div class="w-8 h-8 rounded-xl bg-white text-violet-700 grid place-items-center text-sm font-bold shrink-0 mt-0.5">2</div>
+                                    <div><p class="font-semibold">Apareça no topo</p><p class="text-[14px] text-violet-100 mt-1">Perfil otimizado para Google + destaque no TrafegoHub.</p></div>
+                                </div>
+                                <div class="flex gap-4">
+                                    <div class="w-8 h-8 rounded-xl bg-white text-violet-700 grid place-items-center text-sm font-bold shrink-0 mt-0.5">3</div>
+                                    <div><p class="font-semibold">Receba leads quentes</p><p class="text-[14px] text-violet-100 mt-1">Contato direto no seu WhatsApp, sem comissão.</p></div>
+                                </div>
+                            </div>
+                            <a id="cadastro" href="#" class="mt-8 inline-flex h-11 px-5 items-center rounded-xl bg-white text-violet-700 font-semibold text-sm hover:bg-violet-50">Quero ser encontrado</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gestores -->
+        <section id="gestores" class="py-16 sm:py-24 border-t border-slate-200/60 dark:border-slate-800/60">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+                    <div>
+                        <h2 class="font-display text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">Gestores em destaque</h2>
+                        <p class="mt-2 text-slate-600 dark:text-slate-400">Perfis verificados com resultados comprovados</p>
+                    </div>
+                    <div class="flex items-center gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl">
+                        <button data-filter="todos" class="filter-btn px-4 h-8 rounded-xl text-sm font-medium bg-white dark:bg-slate-700 shadow-sm">Todos</button>
+                        <button data-filter="ecommerce" class="filter-btn px-4 h-8 rounded-xl text-sm font-medium hover:bg-white/50 dark:hover:bg-slate-700/50">E-commerce</button>
+                        <button data-filter="infoprodutos" class="filter-btn px-4 h-8 rounded-xl text-sm font-medium hover:bg-white/50 dark:hover:bg-slate-700/50">Infoprodutos</button>
+                        <button data-filter="local" class="filter-btn px-4 h-8 rounded-xl text-sm font-medium hover:bg-white/50 dark:hover:bg-slate-700/50">Local</button>
+                    </div>
+                </div>
+
+                <div class="mt-10 grid md:grid-cols-3 gap-6">
+                    <!-- Card 1 -->
+                    <div class="gestor-card group relative" data-nicho="ecommerce">
+                        <div class="absolute -inset-0.5 bg-gradient-to-b from-violet-600/0 to-violet-600/0 group-hover:from-violet-600/20 group-hover:to-blue-600/20 rounded-[28px] blur-xl transition"></div>
+                        <div class="relative h-full bg-white dark:bg-slate-900 rounded-[24px] border border-slate-200 dark:border-slate-800 p-6 hover:-translate-y-1 transition">
+                            <div class="flex items-start gap-4">
+                                <div class="relative">
+                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face" class="w-16 h-16 rounded-2xl object-cover" alt="João Silva">
+                                    <span class="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900 grid place-items-center">
+                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                                    </span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="font-semibold text-slate-900 dark:text-white truncate">João Silva</h3>
+                                        <span class="px-2 py-0.5 rounded-lg bg-violet-500/10 text-violet-700 dark:text-violet-300 text-[11px] font-medium">TOP 5%</span>
+                                    </div>
+                                    <p class="text-[13px] text-slate-500">E-commerce • São Paulo, SP</p>
+                                    <div class="mt-1.5 flex items-center gap-1">
+                                        <div class="flex text-amber-500">
+                                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                        </div>
+                                        <span class="text-[12px] font-medium text-slate-700 dark:text-slate-300">4.9</span>
+                                        <span class="text-[12px] text-slate-500">(187)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 flex flex-wrap gap-1.5">
+                                <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[12px] font-medium">Meta Ads</span>
+                                <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[12px] font-medium">Google Ads</span>
+                                <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[12px] font-medium">TikTok Ads</span>
+                            </div>
+                            
+                            <p class="mt-4 text-[13px] text-slate-600 dark:text-slate-400 line-clamp-2">Especialista em escala para lojas. +R$3,2M gerenciados em 2024. ROAS médio 4.8x</p>
+                            
+                            <div class="mt-5 pt-5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                <div>
+                                    <p class="text-[11px] text-slate-500 uppercase tracking-wide font-medium">A partir de</p>
+                                    <p class="text-[18px] font-bold text-slate-900 dark:text-white">R$1.500<span class="text-[12px] font-normal text-slate-500">/mês</span></p>
+                                </div>
+                                <a href="https://wa.me/5511999999" target="_blank" class="inline-flex items-center gap-1.5 h-9 px-4 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white text-[13px] font-semibold shadow-lg shadow-green-600/20 transition">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
+                                    WhatsApp
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="gestor-card group relative" data-nicho="infoprodutos">
+                        <div class="absolute -inset-0.5 bg-gradient-to-b from-violet-600/0 to-violet-600/0 group-hover:from-violet-600/20 group-hover:to-blue-600/20 rounded-[28px] blur-xl transition"></div>
+                        <div class="relative h-full bg-white dark:bg-slate-900 rounded-[24px] border border-slate-200 dark:border-slate-800 p-6 hover:-translate-y-1 transition">
+                            <div class="flex items-start gap-4">
+                                <div class="relative">
+                                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face" class="w-16 h-16 rounded-2xl object-cover" alt="Camila Porto">
+                                    <span class="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900 grid place-items-center">
+                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                                    </span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="font-semibold text-slate-900 dark:text-white truncate">Camila Porto</h3>
+                                        <span class="px-2 py-0.5 rounded-lg bg-fuchsia-500/10 text-fuchsia-700 dark:text-fuchsia-300 text-[11px] font-medium">VERIFICADA</span>
+                                    </div>
+                                    <p class="text-[13px] text-slate-500">Infoprodutos • Florianópolis, SC</p>
+                                    <div class="mt-1.5 flex items-center gap-1">
+                                        <div class="flex text-amber-500">
+                                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                        </div>
+                                        <span class="text-[12px] font-medium text-slate-700 dark:text-slate-300">5.0</span>
+                                        <span class="text-[12px] text-slate-500">(203)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 flex flex-wrap gap-1.5">
+                                <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[12px] font-medium">Meta Ads</span>
+                                <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[12px] font-medium">Funis</span>
+                                <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[12px] font-medium">Lançamentos</span>
+                            </div>
+                            
+                            <p class="mt-4 text-[13px] text-slate-600 dark:text-slate-400 line-clamp-2">34 lançamentos 7 dígitos. Especialista em perpétuo e VSL. CPL -40% em média.</p>
+                            
+                            <div class="mt-5 pt-5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                <div>
+                                    <p class="text-[11px] text-slate-500 uppercase tracking-wide font-medium">A partir de</p>
+                                    <p class="text-[18px] font-bold text-slate-900 dark:text-white">R$2.200<span class="text-[12px] font-normal text-slate-500">/mês</span></p>
+                                </div>
+                                <a href="https://wa.me/5511999999999" target="_blank" class="inline-flex items-center gap-1.5 h-9 px-4 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white text-[13px] font-semibold shadow-lg shadow-green-600/20 transition">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
+                                    WhatsApp
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="gestor-card group relative" data-nicho="local">
+                        <div class="absolute -inset-0.5 bg-gradient-to-b from-violet-600/0 to-violet-600/0 group-hover:from-violet-600/20 group-hover:to-blue-600/20 rounded-[28px] blur-xl transition"></div>
+                        <div class="relative h-full bg-white dark:bg-slate-900 rounded-[24px] border border-slate-200 dark:border-slate-800 p-6 hover:-translate-y-1 transition">
+                            <div class="flex items-start gap-4">
+                                <div class="relative">
+                                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=face" class="w-16 h-16 rounded-2xl object-cover" alt="Anderson Luiz">
+                                    <span class="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900 grid place-items-center">
+                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                                    </span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="font-semibold text-slate-900 dark:text-white truncate">Anderson Luiz</h3>
+                                    </div>
+                                    <p class="text-[13px] text-slate-500">Negócio Local • Curitiba, PR</p>
+                                    <div class="mt-1.5 flex items-center gap-1">
+                                        <div class="flex text-amber-500">
+                                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                            <svg width="14" height="14" fill="currentColor" viewBox="0 0 20" class="text-slate-300 dark:text-slate-600"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                        </div>
+                                        <span class="text-[12px] font-medium text-slate-700 dark:text-slate-300">4.8</span>
+                                        <span class="text-[12px] text-slate-500">(96)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 flex flex-wrap gap-1.5">
+                                <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[12px] font-medium">Google Ads</span>
+                                <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[12px] font-medium">Meta Ads</span>
+                                <span class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[12px] font-medium">Local</span>
+                            </div>
+                            
+                            <p class="mt-4 text-[13px] text-slate-600 dark:text-slate-400 line-clamp-2">120+ negócios locais ativos. Clínicas, delivery e serviços. Foco em ligações e WhatsApp.</p>
+                            
+                            <div class="mt-5 pt-5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                <div>
+                                    <p class="text-[11px] text-slate-5 00 uppercase tracking-wide font-medium">A partir de</p>
+                                    <p class="text-[18px] font-bold text-slate-900 dark:text-white">R$900<span class="text-[12px] font-normal text-slate-500">/mês</span></p>
+                                </div>
+                                <a href="https://wa.me/5511999999999" target="_blank" class="inline-flex items-center gap-1.5 h-9 px-4 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white text-[13px] font-semibold shadow-lg shadow-green-600/20 transition">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
+                                    WhatsApp
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-10 text-center">
+                    <a href="#" class="inline-flex items-center gap-2 text-[14px] font-semibold text-violet-700 dark:text-violet-300 hover:gap-3 transition-all">
+                        Ver todos os 523 gestores
+                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing -->
+        <section id="precos" class="py-16 sm:py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="max-w-2xl mx-auto text-center">
+                    <h2 class="font-display text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">Planos para gestores</h2>
+                    <p class="mt-3 text-slate-600 dark:text-slate-400">Comece grátis. Escale quando fizer sentido.</p>
+                </div>
+
+                <div class="mt-12 grid lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                    <!-- Free -->
+                    <div class="relative rounded-[28px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8">
+                        <h3 class="text-[22px] font-bold text-slate-900 dark:text-white">Free</h3>
+                        <p class="mt-1 text-[14px] text-slate-600 dark:text-slate-400">Para começar</p>
+                        <div class="mt-6 flex items-baseline gap-1">
+                            <span class="text-[40px] font-extrabold tracking-tight text-slate-900 dark:text-white">R$0</span>
+                            <span class="text-slate-500">/mês</span>
+                        </div>
+                        <ul class="mt-6 space-y-3 text-[14px]">
+                            <li class="flex gap-2.5"><svg class="w-5 h-5 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>Perfil básico nas buscas</li>
+                            <li class="flex gap-2.5"><svg class="w-5 h-5 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>Até 3 contatos/mês</li>
+                            <li class="flex gap-2.5"><svg class="w-5 h-5 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>Link direto WhatsApp</li>
+                        </ul>
+                        <a href="#" class="mt-8 w-full h-11 grid place-items-center rounded-xl border border-slate-300 dark:border-slate-700 font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition">Criar perfil grátis</a>
+                    </div>
+
+                    <!-- Pro -->
+                    <div class="relative rounded-[28px] bg-gradient-to-b from-violet-600 to-blue-600 p-[1.5px] shadow-2xl shadow-violet-600/20">
+                        <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-slate-900 text-white text-[11px] font-bold uppercase tracking-wider">Mais popular</div>
+                        <div class="h-full rounded-[26px] bg-white dark:bg-slate-950 p-8">
+                            <h3 class="text-[22px] font-bold text-slate-900 dark:text-white">Pro</h3>
+                            <p class="mt-1 text-[14px] text-slate-600 dark:text-slate-400">Para quem leva a sério</p>
+                            <div class="mt-6 flex items-baseline gap-1">
+                                <span class="text-[40px] font-extrabold tracking-tight gradient-text">R$49</span>
+                                <span class="text-slate-500">/mês</span>
+                            </div>
+                            <ul class="mt-6 space-y-3 text-[14px]">
+                                <li class="flex gap-2.5"><svg class="w-5 h-5 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>Tudo do Free +</li>
+                                <li class="flex gap-2.5"><svg class="w-5 h-5 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>Destaque nas buscas</li>
+                                <li class="flex gap-2.5"><svg class="w-5 h-5 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>Contatos ilimitados</li>
+                                <li class="flex gap-2.5"><svg class="w-5 h-5 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>SEO: rankeia no Google</li>
+                                <li class="flex gap-2.5"><svg class="w-5 h-5 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>Selo verificado + portfólio</li>
+                            </ul>
+                            <a href="#" class="mt-8 w-full h-11 grid place-items-center rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 text-white font-semibold shadow-lg shadow-violet-600/25 hover:shadow-xl transition">Assinar Pro</a>
+                            <p class="mt-3 text-center text-[12px] text-slate-500">Cancele quando quiser</p>
+                        </div>
+                    </div>
+
+                    <!-- Agência -->
+                    <div class="relative rounded-[28px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8">
+                        <h3 class="text-[22px] font-bold text-slate-900 dark:text-white">Agência</h3>
+                        <p class="mt-1 text-[14px] text-slate-600 dark:text-slate-400">Para times</p>
+                        <div class="mt-6 flex items-baseline gap-1">
+                            <span class="text-[40px] font-extrabold tracking-tight text-slate-900 dark:text-white">R$149</span>
+                            <span class="text-slate-500">/mês</span>
+                        </div>
+                        <ul class="mt-6 space-y-3 text-[14px]">
+                            <li class="flex gap-2.5"><svg class="w-5 h-5 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>Tudo do Pro +</li>
+                            <li class="flex gap-2.5"><svg class="w-5 h-5 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>Até 5 gestores</li>
+                            <li class="flex gap-2.5"><svg class="w-5 h-5 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>Página da agência</li>
+                            <li class="flex gap-2.5"><svg class="w-5 h-5 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>Leads prioritários</li>
+                        </ul>
+                        <a href="#" class="mt-8 w-full h-11 grid place-items-center rounded-xl border border-slate-300 dark:border-slate-700 font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition">Falar com vendas</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final CTA -->
+        <section class="py-16">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="relative overflow-hidden rounded-[32px] bg-slate-950 dark:bg-black border-slate-800 p-[1px]">
+                    <div class="absolute inset-0 bg-gradient-to-r from-violet-600/20 to-blue-600/20"></div>
+                    <div class="relative bg-slate-950 rounded-[31px] px-8 py-14 sm:px-14 text-center">
+                        <h3 class="font-display text-3xl sm:text-4xl font-bold text-white">Pronto para crescer com tráfego pago?</h3>
+                        <p class="mt-3 text-slate-400 max-w-xl mx-auto">Empresas encontram o gestor ideal em minutos. Gestores recebem clientes todos os dias.</p>
+                        <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+                            <a href="#gestores" class="w-full sm:w-auto h-12 px-7 grid place-items-center rounded-2xl bg-white text-slate-900 font-semibold hover:bg-slate-100 transition">Preciso contratar</a>
+                            <a href="#cadastro" class="w-full sm:w-auto h-12 px-7 grid place-items-center rounded-2xl bg-slate-800 text-white font-semibold hover:bg-slate-700 transition border border-slate-700">Quero ser encontrado</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-200 dark:border-slate-800 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-blue-600 flex items-center justify-center">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="text-white"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                    <span class="font-display font-bold text-slate-900 dark:text-white">TrafegoHub</span>
+                </div>
+                <div class="flex items-center gap-6 text-[14px] text-slate-600 dark:text-slate-400">
+                    <a href="#" class="hover:text-violet-600">Termos</a>
+                    <a href="#" class="hover:text-violet-600">Privacidade</a>
+                    <a href="mailto:contato@trafegohub.com.br" class="hover:text-violet-600">contato@trafegohub.com.br</a>
+                </div>
+                <p class="text-[13px] text-slate-500">© 2025 TrafegoHub. Feito no Brasil 🇧🇷</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Float -->
+    <a href="https://wa.me/5511999999999" target="_blank" class="fixed bottom-5 right-5 z-50 w-14 h-14 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-white grid place-items-center shadow-2xl shadow-green-600/30 hover:scale-105 transition">
+        <svg width="28" height="28" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12.001 2.002c-5.522 0-10 4.477-10 10.001 0 1.738.44 3.372 1.206 4.796l-1.276 4.666 4.774-1.252a9.953 9.953 0 004.296.99c5.522 0 9.999-4.477 9.999-10 0-5.523-4.477-10.001-9.999-10.001zm0 18.001a7.962 7.962 0 01-4.06-1.108l-.29-.174-2.834.743.757-2.763-.189-.284a7.956 7.956 0 01-1.222-4.413c0-4.41 3.588-8 8-8s7.999 3.59 7.999 8-3.587 8-7.999 8z"/></svg>
+    </a>
+
+    <script>
+        // Theme toggle
+        const html = document.documentElement;
+        const themeToggle = document.getElementById('themeToggle');
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        }
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+        });
+
+        // Filter gestores
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const cards = document.querySelectorAll('.gestor-card');
+        
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => {
+                    b.classList.remove('bg-white', 'dark:bg-slate-700', 'shadow-sm');
+                    b.classList.add('hover:bg-white/50', 'dark:hover:bg-slate-700/50');
+                });
+                btn.classList.add('bg-white', 'dark:bg-slate-700', 'shadow-sm');
+                btn.classList.remove('hover:bg-white/50', 'dark:hover:bg-slate-700/50');
+                
+                const filter = btn.dataset.filter;
+                cards.forEach(card => {
+                    const nicho = card.dataset.nicho;
+                    if (filter === 'todos' || nicho === filter) {
+                        card.style.display = 'block';
+                        setTimeout(() => card.style.opacity = '1', 10);
+                    } else {
+                        card.style.opacity = '0';
+                        setTimeout(() => card.style.display = 'none', 200);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
