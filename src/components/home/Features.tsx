@@ -34,13 +34,13 @@ const features = [
 
 export default function Features() {
   return (
-    <section id="features" className="py-16 sm:py-24 border-t border-slate-200/60 dark:border-slate-800/60">
+    <section id="features" className="py-24 sm:py-32 border-t border-slate-200/60 dark:border-slate-800/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl">
           <h2 className="font-[family-name:var(--font-outfit)] text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
             Tudo que você precisa, sem enrolação
           </h2>
-          <p className="mt-3 text-slate-600 dark:text-slate-400">
+          <p className="mt-4 text-lg text-slate-700 dark:text-slate-400 font-medium">
             Criamos o TrafegoHub para acabar com indicações às cegas.
           </p>
         </div>
@@ -64,10 +64,10 @@ export default function Features() {
                     <feature.icon className="w-5 h-5 text-white" />
                   )}
                 </div>
-                <h3 className="mt-5 font-semibold text-slate-900 dark:text-white">
+                <h3 className="mt-5 font-bold text-slate-900 dark:text-white text-lg">
                   {feature.title}
                 </h3>
-                <p className="mt-2 text-[14px] leading-relaxed text-slate-600 dark:text-slate-400">
+                <p className="mt-2 text-[15px] leading-relaxed text-slate-700 dark:text-slate-400 font-medium">
                   {feature.description}
                 </p>
               </div>

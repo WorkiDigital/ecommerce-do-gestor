@@ -24,7 +24,7 @@ const plans = [
     ],
     cta: "Assinar Pro",
     ctaStyle:
-      "bg-gradient-to-r from-violet-600 to-blue-600 text-white shadow-lg shadow-violet-600/25 hover:shadow-xl",
+      "bg-gradient-to-r from-blue-700 to-indigo-700 dark:from-violet-600 dark:to-blue-600 text-white shadow-lg shadow-indigo-600/25 dark:shadow-violet-600/25 hover:shadow-xl",
     highlight: true,
     badge: "Mais popular",
   },
@@ -41,13 +41,13 @@ const plans = [
 
 export default function Pricing() {
   return (
-    <section id="precos" className="py-16 sm:py-24">
+    <section id="precos" className="py-24 sm:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="font-[family-name:var(--font-outfit)] text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">
             Planos para gestores
           </h2>
-          <p className="mt-3 text-slate-600 dark:text-slate-400">
+          <p className="mt-4 text-lg text-slate-700 dark:text-slate-400 font-medium">
             Comece grátis. Escale quando fizer sentido.
           </p>
         </div>
@@ -58,8 +58,8 @@ export default function Pricing() {
               key={plan.name}
               className={
                 plan.highlight
-                  ? "relative rounded-[28px] bg-gradient-to-b from-violet-600 to-blue-600 p-[1.5px] shadow-2xl shadow-violet-600/20"
-                  : "relative rounded-[28px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8"
+                  ? "relative rounded-[28px] bg-gradient-to-b from-blue-700 to-indigo-700 dark:from-violet-600 dark:to-blue-600 p-[1.5px] shadow-2xl shadow-indigo-600/20 dark:shadow-violet-600/20"
+                  : "relative rounded-[28px] bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 p-8"
               }
             >
               {plan.badge && (
@@ -75,7 +75,7 @@ export default function Pricing() {
                 <div className="mt-6 flex items-baseline gap-1">
                   <span
                     className={`text-[40px] font-extrabold tracking-tight ${
-                      plan.highlight ? "gradient-text" : "text-slate-900 dark:text-white"
+                      plan.highlight ? "bg-gradient-to-r from-blue-700 to-indigo-700 dark:from-violet-400 dark:to-blue-400 bg-clip-text text-transparent" : "text-slate-900 dark:text-white"
                     }`}
                   >
                     {plan.price}

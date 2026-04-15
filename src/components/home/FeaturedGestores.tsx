@@ -21,7 +21,7 @@ export default function FeaturedGestores({ initialGestores = [] }: { initialGest
       : initialGestores.filter((g) => g.niches.includes(activeFilter)).slice(0, 3);
 
   return (
-    <section id="gestores" className="py-16 sm:py-24 border-t border-slate-200/60 dark:border-slate-800/60">
+    <section id="gestores" className="py-24 sm:py-32 border-t border-slate-200/60 dark:border-slate-800/60">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
@@ -29,7 +29,7 @@ export default function FeaturedGestores({ initialGestores = [] }: { initialGest
             <h2 className="font-[family-name:var(--font-outfit)] text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
               Gestores em destaque
             </h2>
-            <p className="mt-2 text-slate-600 dark:text-slate-400">
+            <p className="mt-2 text-lg text-slate-700 dark:text-slate-400 font-medium">
               Perfis verificados com resultados comprovados
             </p>
           </div>
@@ -67,10 +67,10 @@ export default function FeaturedGestores({ initialGestores = [] }: { initialGest
         <div className="mt-10 text-center">
           <Link
             href="/gestores"
-            className="inline-flex items-center gap-2 text-[14px] font-semibold text-violet-700 dark:text-violet-300 hover:gap-3 transition-all"
+            className="inline-flex items-center gap-2 text-[15px] font-bold text-blue-700 hover:text-blue-800 dark:text-blue-400 hover:gap-3 transition-all"
           >
             Ver todos os gestores
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-5 h-5" />
           </Link>
         </div>
       </div>

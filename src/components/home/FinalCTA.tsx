@@ -5,18 +5,18 @@ import { Zap } from "lucide-react";
 
 export default function FinalCTA() {
   return (
-    <section className="py-16">
+    <section className="py-24 sm:py-32">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Outer wrapper with gradient border on both themes */}
-        <div className="relative rounded-[32px] p-[1.5px] bg-gradient-to-r from-violet-600/60 via-blue-600/60 to-fuchsia-600/40">
+        <div className="relative rounded-[32px] p-[1.5px] bg-gradient-to-r from-blue-700/60 via-indigo-600/60 to-blue-500/40">
           {/* Inner card — dark in dark mode, near-dark in light mode */}
           <div className="relative overflow-hidden rounded-[30px] bg-slate-950 px-8 py-14 sm:px-14 text-center">
             {/* Subtle glow blobs inside */}
-            <div className="absolute -top-20 -right-20 w-64 h-64 bg-violet-600/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -top-20 -right-20 w-64 h-64 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
 
             {/* Icon badge */}
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-600 to-blue-600 shadow-xl shadow-violet-600/30 mb-6">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-700 to-indigo-700 shadow-xl shadow-indigo-600/30 mb-6">
               <Zap className="w-7 h-7 text-white" />
             </div>
 
@@ -26,16 +26,16 @@ export default function FinalCTA() {
             <p className="mt-3 text-slate-400 max-w-xl mx-auto">
               Empresas encontram o gestor ideal em minutos. Gestores recebem clientes todos os dias.
             </p>
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 href="/gestores"
-                className="w-full sm:w-auto h-12 px-8 inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-violet-600 to-blue-600 text-white font-semibold shadow-lg shadow-violet-600/25 hover:shadow-xl hover:shadow-violet-600/30 hover:-translate-y-0.5 transition-all"
+                className="w-full sm:w-auto h-14 px-8 inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-blue-700 to-indigo-700 text-white text-lg font-bold shadow-xl shadow-indigo-600/25 hover:shadow-2xl hover:shadow-indigo-600/30 hover:-translate-y-1 transition-all"
               >
                 Preciso contratar
               </Link>
               <Link
                 href="/cadastrar"
-                className="w-full sm:w-auto h-12 px-8 inline-flex items-center justify-center rounded-2xl bg-white/10 border border-white/15 text-white font-semibold hover:bg-white/15 backdrop-blur transition"
+                className="w-full sm:w-auto h-14 px-8 inline-flex items-center justify-center rounded-2xl bg-white/10 border-2 border-white/15 text-white text-lg font-bold hover:bg-white/15 backdrop-blur transition"
               >
                 Quero ser encontrado
               </Link>

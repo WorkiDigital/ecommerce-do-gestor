@@ -14,7 +14,7 @@ const gestorSteps = [
 
 export default function HowItWorks() {
   return (
-    <section className="py-16 sm:py-24">
+    <section className="py-24 sm:py-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Para empresas */}
@@ -35,7 +35,7 @@ export default function HowItWorks() {
                     </div>
                     <div>
                       <p className="font-semibold text-slate-900 dark:text-white">{step.title}</p>
-                      <p className="text-[14px] text-slate-600 dark:text-slate-400 mt-1">{step.description}</p>
+                      <p className="text-[15px] text-slate-700 dark:text-slate-400 mt-1 font-medium">{step.description}</p>
                     </div>
                   </div>
                 ))}
@@ -50,7 +50,7 @@ export default function HowItWorks() {
           </div>
 
           {/* Para gestores */}
-          <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-violet-600 to-blue-600 p-8 sm:p-10 text-white">
+          <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-blue-700 to-indigo-700 p-8 sm:p-10 text-white shadow-xl shadow-indigo-600/10">
             <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-white/10 rounded-full blur-3xl" />
             <div className="relative">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-white text-xs font-semibold backdrop-blur">
@@ -62,19 +62,19 @@ export default function HowItWorks() {
               <div className="mt-8 space-y-6">
                 {gestorSteps.map((step, i) => (
                   <div key={i} className="flex gap-4">
-                    <div className="w-8 h-8 rounded-xl bg-white text-violet-700 grid place-items-center text-sm font-bold shrink-0 mt-0.5">
+                    <div className="w-8 h-8 rounded-xl bg-white text-blue-700 grid place-items-center text-sm font-bold shrink-0 mt-0.5">
                       {i + 1}
                     </div>
                     <div>
                       <p className="font-semibold">{step.title}</p>
-                      <p className="text-[14px] text-violet-100 mt-1">{step.description}</p>
+                      <p className="text-[15px] text-blue-100 mt-1 font-medium">{step.description}</p>
                     </div>
                   </div>
                 ))}
               </div>
               <Link
                 href="/cadastrar"
-                className="mt-8 inline-flex h-11 px-5 items-center rounded-xl bg-white text-violet-700 font-semibold text-sm hover:bg-violet-50 transition"
+                className="mt-8 inline-flex h-11 px-5 items-center rounded-xl bg-white text-blue-800 font-bold text-sm hover:bg-blue-50 transition"
               >
                 Quero ser encontrado
               </Link>
