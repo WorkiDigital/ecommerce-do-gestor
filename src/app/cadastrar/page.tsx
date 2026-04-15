@@ -1,15 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { NICHOS, PLATAFORMAS } from "@/lib/constants";
-import { Check, ArrowRight, ArrowLeft, Zap, Upload } from "lucide-react";
+import { Check, ArrowRight, ArrowLeft, Zap, Upload, Loader2 } from "lucide-react";
+import { createProfile } from "../actions/profile";
 
 const steps = ["Dados pessoais", "Profissional", "Redes & Contato", "Revisão"];
 
 export default function CadastrarPage() {
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   const [form, setForm] = useState({
     displayName: "",
     city: "",
@@ -41,9 +45,21 @@ export default function CadastrarPage() {
   const nextStep = () => setCurrentStep(Math.min(currentStep + 1, steps.length - 1));
   const prevStep = () => setCurrentStep(Math.max(currentStep - 1, 0));
 
-  const handleSubmit = () => {
-    // TODO: Save to Supabase
-    alert("Perfil criado com sucesso! (Em breve com backend)");
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    try {
+      const res = await createProfile(form);
+      if (res.success) {
+        alert("Perfil criado com sucesso!");
+        router.push(`/dashboard`);
+      } else {
+        alert(res.error || "Ocorreu um erro ao criar o perfil.");
+      }
+    } catch (error) {
+      alert("Erro de comunicação com o servidor.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -341,9 +357,11 @@ export default function CadastrarPage() {
               ) : (
                 <button
                   onClick={handleSubmit}
-                  className="h-10 px-6 flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 text-white text-sm font-semibold shadow-lg shadow-violet-600/25 hover:shadow-xl transition"
+                  disabled={isLoading}
+                  className="h-10 px-6 flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 text-white text-sm font-semibold shadow-lg shadow-violet-600/25 hover:shadow-xl transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Zap className="w-4 h-4" /> Publicar perfil
+                  {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />} 
+                  {isLoading ? "Salvando..." : "Publicar perfil"}
                 </button>
               )}
             </div>
