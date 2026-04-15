@@ -109,7 +109,7 @@ export default async function LeadsPage() {
                     </div>
                     {lead.instagram && (
                       <div className="flex items-center gap-2">
-                        <Instagram className="w-4 h-4 text-slate-400" />
+                        <InstagramIcon />
                         <span>{lead.instagram}</span>
                       </div>
                     )}

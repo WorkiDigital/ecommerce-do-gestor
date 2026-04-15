@@ -46,6 +46,7 @@ model User {
   image         String?
   passwordHash  String?
   role          String    @default("GESTOR") // GESTOR, ADMIN
+  status        String    @default("ACTIVE") // ACTIVE, BANNED
   accounts      Account[]
   sessions      Session[]
   profile       Profile?
@@ -88,6 +89,9 @@ model Profile {
   
   avgRating     Float    @default(0)
   reviewCount   Int      @default(0)
+  
+  views         Int      @default(0)
+  whatsappClicks Int     @default(0)
   
   reviews       Review[]
   leads         Lead[]
