@@ -14,9 +14,10 @@ import {
   Phone,
   Eye,
   ArrowUpRight,
-  Users
+  Users,
+  Star
 } from "lucide-react";
-import { toggleUserVerification, toggleUserPro, toggleUserStatus } from "@/app/actions/admin";
+import { toggleUserVerification, toggleUserPro, toggleUserStatus, toggleUserFeatured } from "@/app/actions/admin";
 
 export default function AdminClient({ initialUsers }: { initialUsers: any[] }) {
   const [users, setUsers] = useState(initialUsers);
@@ -35,6 +36,7 @@ export default function AdminClient({ initialUsers }: { initialUsers: any[] }) {
     let result;
     if (action === "verify" && profileId) result = await toggleUserVerification(profileId);
     if (action === "pro" && profileId) result = await toggleUserPro(profileId);
+    if (action === "featured" && profileId) result = await toggleUserFeatured(profileId);
     if (action === "status") result = await toggleUserStatus(userId);
 
     if (result?.success) {
@@ -44,6 +46,7 @@ export default function AdminClient({ initialUsers }: { initialUsers: any[] }) {
           if (action === "status") return { ...u, status: u.status === "BANNED" ? "ACTIVE" : "BANNED" };
           if (action === "verify" && u.profile) return { ...u, profile: { ...u.profile, isVerified: !u.profile.isVerified } };
           if (action === "pro" && u.profile) return { ...u, profile: { ...u.profile, plan: u.profile.plan === "pro" ? "free" : "pro" } };
+          if (action === "featured" && u.profile) return { ...u, profile: { ...u.profile, isFeatured: !u.profile.isFeatured } };
         }
         return u;
       }));
@@ -167,6 +170,17 @@ export default function AdminClient({ initialUsers }: { initialUsers: any[] }) {
                             title={user.profile.plan === "pro" ? "Remover PRO" : "Tornar PRO"}
                           >
                             <Zap className="w-4 h-4" />
+                          </button>
+
+                          <button
+                            onClick={() => handleAction(user.id, user.profile.id, "featured")}
+                            disabled={loadingId === `${user.id}-featured`}
+                            className={`p-2 rounded-lg transition ${
+                              user.profile.isFeatured ? "text-violet-600 bg-violet-50" : "text-slate-400 hover:bg-slate-100"
+                            }`}
+                            title={user.profile.isFeatured ? "Remover do Destaque" : "Colocar em Destaque (Home)"}
+                          >
+                            <Star className="w-4 h-4 shadow-sm" />
                           </button>
 
                           <a 

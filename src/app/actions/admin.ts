@@ -67,3 +67,21 @@ export async function toggleUserStatus(userId: string) {
     return { success: false, error: error.message };
   }
 }
+export async function toggleUserFeatured(profileId: string) {
+  await verifyAdmin();
+  try {
+    const profile = await prisma.profile.findUnique({ where: { id: profileId } });
+    if (!profile) return { success: false, error: "Perfil não encontrado" };
+
+    await prisma.profile.update({
+      where: { id: profileId },
+      data: { isFeatured: !profile.isFeatured }
+    });
+
+    revalidatePath("/dashboard/admin");
+    revalidatePath("/");
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
