@@ -7,12 +7,18 @@ import ReviewForm from "./ReviewForm";
 
 export const dynamic = "force-dynamic";
 
-export default async function AvaliarPage({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+export default async function AvaliarPage({ params }: { params: Promise<{ slug: string }> }) {
+  const resolvedParams = await params;
+  const { slug } = resolvedParams;
   
-  const gestor = await prisma.profile.findUnique({
-    where: { slug },
-  });
+  let gestor = null;
+  try {
+    gestor = await prisma.profile.findUnique({
+      where: { slug },
+    });
+  } catch (error) {
+    console.warn("Falha ao buscar gestor no BD:", error);
+  }
 
   if (!gestor) {
     return (
