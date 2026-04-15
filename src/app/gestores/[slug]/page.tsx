@@ -17,7 +17,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   
   const gestor = await prisma.profile.findUnique({
-    where: { slug }
+    where: { slug },
+    include: {
+      portfolio: {
+        orderBy: { createdAt: "desc" }
+      }
+    }
   });
 
   if (!gestor) return { title: "Gestor não encontrado" };

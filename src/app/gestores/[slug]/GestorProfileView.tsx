@@ -1,9 +1,53 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { 
+  MapPin, 
+  Star, 
+  Check, 
+  ArrowLeft, 
+  ExternalLink, 
+  X, 
+  TrendingUp, 
+  Image as ImageIcon 
+} from "lucide-react";
 import { NICHOS, PLATAFORMAS } from "@/lib/constants";
 import { createLeadAction } from "./actions";
 import { incrementProfileViews, incrementWhatsappClicks } from "@/app/actions/analytics";
-import { useEffect } from "react";
+
+interface Review {
+  id: string;
+  reviewerName: string;
+  reviewerCompany?: string | null;
+  rating: number;
+  comment: string;
+  response?: string | null;
+  createdAt: Date | string;
+}
+
+interface GestorProfile {
+  id: string;
+  slug: string;
+  displayName: string;
+  avatarUrl: string;
+  isVerified: boolean;
+  badge?: string | null;
+  plan: string;
+  city: string;
+  state: string;
+  avgRating: number;
+  reviewCount: number;
+  niches: string[];
+  platforms: string[];
+  bio: string;
+  minPrice: number;
+  whatsapp: string;
+  instagram?: string | null;
+  facebook?: string | null;
+  website?: string | null;
+  portfolio?: any[];
+}
 
 function StarRating({ rating, size = 18 }: { rating: number; size?: number }) {
   return (
@@ -196,6 +240,55 @@ export default function GestorProfileView({
               </div>
             </div>
 
+            {/* Portfolio Section */}
+            {gestor.portfolio && gestor.portfolio.length > 0 && (
+              <div className="mb-10">
+                <h2 className="font-[family-name:var(--font-outfit)] text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-violet-600" />
+                  Casos de Sucesso
+                </h2>
+                <div className="grid sm:grid-cols-2 gap-6">
+                  {gestor.portfolio.map((item: any) => (
+                    <div key={item.id} className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-md transition group">
+                      <div className="aspect-video bg-slate-100 dark:bg-slate-800 relative overflow-hidden">
+                        {item.imageUrl ? (
+                          <img 
+                            src={item.imageUrl} 
+                            alt={item.title} 
+                            className="w-full h-full object-cover group-hover:scale-105 transition duration-500" 
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-slate-300">
+                             <ImageIcon className="w-10 h-10 opacity-20" />
+                          </div>
+                        )}
+                        {item.metrics?.roas && (
+                          <div className="absolute top-4 right-4 px-3 py-1 bg-emerald-500 text-white text-xs font-bold rounded-full shadow-lg">
+                            ROAS {item.metrics.roas}
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-5">
+                        <h3 className="font-bold text-slate-900 dark:text-white mb-2">{item.title}</h3>
+                        <p className="text-sm text-slate-500 line-clamp-3 mb-4">{item.description}</p>
+                        
+                        <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
+                          <div className="flex flex-col">
+                            <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Investido</span>
+                            <span className="text-sm font-bold text-slate-900 dark:text-white">{item.metrics?.investment || "-"}</span>
+                          </div>
+                          <div className="flex flex-col text-right">
+                            <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">CPL</span>
+                            <span className="text-sm font-bold text-slate-900 dark:text-white">{item.metrics?.cpl || "-"}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Reviews */}
             <div>
               <div className="flex items-center justify-between mb-5">
@@ -228,6 +321,7 @@ export default function GestorProfileView({
                 </div>
               )}
             </div>
+
           </div>
 
           {/* Sidebar */}
