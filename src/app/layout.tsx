@@ -17,6 +17,7 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://trafegohub.workidigital.tech"),
   title: {
     default: "TrafegoHub — Encontre o gestor de tráfego certo em 2 minutos",
     template: "%s | TrafegoHub",
@@ -38,6 +39,13 @@ export const metadata: Metadata = {
       "Avaliações verificadas, portfólio real e contato direto via WhatsApp. Sem taxa, sem burocracia.",
     type: "website",
     locale: "pt_BR",
+    siteName: "TrafegoHub",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TrafegoHub — Encontre o gestor de tráfego certo em 2 minutos",
+    description: "Avaliações verificadas, portfólio real e contato direto via WhatsApp.",
+    creator: "@workidigital",
   },
 };
 

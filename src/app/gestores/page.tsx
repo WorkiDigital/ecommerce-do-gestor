@@ -1,9 +1,20 @@
+import type { Metadata } from "next";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import WhatsAppFloat from "@/components/layout/WhatsAppFloat";
 import prisma from "@/lib/prisma";
 import GestoresClientPage from "./GestoresClientPage";
 import { Suspense } from "react";
+
+export const metadata: Metadata = {
+  title: "Encontre os Melhores Gestores de Tráfego",
+  description: "Explore nosso marketplace de gestores de tráfego pago. Filtre por nicho, plataforma e veja avaliações reais antes de contratar.",
+  openGraph: {
+    title: "Marketplace de Gestores de Tráfego — TrafegoHub",
+    description: "Contrate especialistas certificados em Google Ads, Meta Ads e mais. Portfólio verificado.",
+    type: "website",
+  },
+};
 
 export const dynamic = "force-dynamic";
 

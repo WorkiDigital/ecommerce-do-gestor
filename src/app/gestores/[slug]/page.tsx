@@ -27,13 +27,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!gestor) return { title: "Gestor não encontrado" };
 
+  const title = `${gestor.displayName} — Gestor de Tráfego ${gestor.niches.map(n => NICHOS.find(nn => nn.value === n)?.label || n).join(", ")}`;
+  const description = `⭐ ${gestor.avgRating} (${gestor.reviewCount} avaliações) • ${gestor.city}, ${gestor.state} • ${gestor.tagline}`;
+
   return {
-    title: `${gestor.displayName} — Gestor de Tráfego ${gestor.niches.map(n => NICHOS.find(nn => nn.value === n)?.label || n).join(", ")}`,
-    description: `⭐ ${gestor.avgRating} (${gestor.reviewCount} avaliações) • ${gestor.city}, ${gestor.state} • ${gestor.tagline}`,
+    title,
+    description,
     openGraph: {
       title: `${gestor.displayName} | TrafegoHub`,
       description: gestor.tagline || "",
-      images: gestor.avatarUrl ? [gestor.avatarUrl] : [],
+      images: gestor.avatarUrl ? [gestor.avatarUrl] : ["/og-image.png"],
+      type: "profile",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: gestor.avatarUrl ? [gestor.avatarUrl] : ["/og-image.png"],
     },
   };
 }
