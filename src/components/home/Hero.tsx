@@ -147,7 +147,7 @@ export default function Hero({ totalGestores = 0 }: { totalGestores?: number }) 
                   </div>
                   <button
                     type="submit"
-                    className="h-14 px-8 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-base hover:bg-slate-800 transition"
+                    className="w-full sm:w-auto h-14 px-10 rounded-2xl bg-gradient-to-r from-blue-700 to-indigo-700 text-white font-bold text-[17px] shadow-lg shadow-blue-700/20 hover:shadow-xl hover:shadow-blue-700/30 active:scale-[0.98] transition-all"
                   >
                     Buscar gestores
                   </button>
