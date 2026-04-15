@@ -33,14 +33,14 @@ export default async function DashboardPage() {
     );
   }
 
-  // Preparar dados para o cliente (Recharts precisa ser client-side)
+  // Dados reais para o cliente
   return (
     <DashboardClient 
       profile={profile} 
       initialLeads={profile.leads}
       stats={{
-        views: 124, // Simulado até integrarmos analytics
-        whatsappClicks: 37, // Simulado
+        views: profile.views || 0,
+        whatsappClicks: profile.whatsappClicks || 0,
         leadsCount: profile.leads.length,
         avgRating: profile.avgRating,
         reviewCount: profile.reviewCount
@@ -48,3 +48,4 @@ export default async function DashboardPage() {
     />
   );
 }
+

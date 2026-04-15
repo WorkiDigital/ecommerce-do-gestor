@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { Star, Check, ExternalLink, MapPin, ArrowLeft, X } from "lucide-react";
-import type { GestorProfile, Review } from "@/lib/data";
 import { NICHOS, PLATAFORMAS } from "@/lib/constants";
 import { createLeadAction } from "./actions";
+import { incrementProfileViews, incrementWhatsappClicks } from "@/app/actions/analytics";
+import { useEffect } from "react";
 
 function StarRating({ rating, size = 18 }: { rating: number; size?: number }) {
   return (
@@ -76,6 +74,19 @@ export default function GestorProfileView({
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  // Track page view
+  useEffect(() => {
+    if (gestor.id) {
+      incrementProfileViews(gestor.id);
+    }
+  }, [gestor.id]);
+
+  const handleWhatsappClick = async () => {
+    if (gestor.id) {
+      await incrementWhatsappClicks(gestor.id);
+    }
+  };
 
   const handleLeadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -245,6 +256,7 @@ export default function GestorProfileView({
                   href={`https://wa.me/${gestor.whatsapp}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={handleWhatsappClick}
                   className="w-full h-11 flex items-center justify-center gap-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition"
                 >
                   <svg width="18" height="18" fill="#25D366" viewBox="0 0 24 24">

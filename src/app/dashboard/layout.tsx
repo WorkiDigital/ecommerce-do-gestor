@@ -1,12 +1,22 @@
 import Link from "next/link";
-import { Zap, LayoutDashboard, UserCircle, Settings, LogOut } from "lucide-react";
-import { signOut } from "@/auth";
+import { Zap, LayoutDashboard, UserCircle, Settings, LogOut, AlertCircle, ShieldCheck, Users } from "lucide-react";
+import { signOut, auth } from "@/auth";
+import prisma from "@/lib/prisma";
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await auth();
+  
+  // Buscar perfil para verificar completude
+  const profile = session?.user?.id 
+    ? await prisma.profile.findUnique({ where: { userId: session.user.id } })
+    : null;
+
+  const isIncomplete = !profile || !profile.bio || profile.niches.length === 0;
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col md:flex-row">
       {/* Sidebar Desktop */}
@@ -38,12 +48,28 @@ export default function DashboardLayout({
             Meu Perfil
           </Link>
           <Link
+            href="/dashboard/leads"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium text-sm transition"
+          >
+            <Users className="w-5 h-5" />
+            Meus Leads
+          </Link>
+          <Link
             href="/dashboard/configuracoes"
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium text-sm transition"
           >
             <Settings className="w-5 h-5" />
             Configurações
           </Link>
+          {session?.user?.role === "ADMIN" && (
+            <Link
+              href="/dashboard/admin"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 font-medium text-sm transition mt-4"
+            >
+              <ShieldCheck className="w-5 h-5" />
+              Painel Admin
+            </Link>
+          )}
         </nav>
 
         <div className="p-4 border-t border-slate-200 dark:border-slate-800">
@@ -75,8 +101,24 @@ export default function DashboardLayout({
       </div>
 
       {/* Main Content Area */}
-      <main className="flex-1 md:pl-64">
-        {children}
+      <main className="flex-1 md:pl-64 flex flex-col">
+        {isIncomplete && (
+          <div className="bg-amber-50 dark:bg-amber-900/10 border-b border-amber-200 dark:border-amber-800/50 px-6 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 text-amber-800 dark:text-amber-400 text-sm">
+              <AlertCircle className="w-4 h-4" />
+              <p>Seu perfil está incompleto e não aparecerá nos resultados de busca.</p>
+            </div>
+            <Link 
+              href="/dashboard/perfil" 
+              className="text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300 hover:underline"
+            >
+              Completar Agora
+            </Link>
+          </div>
+        )}
+        <div className="flex-1">
+          {children}
+        </div>
       </main>
     </div>
   );
