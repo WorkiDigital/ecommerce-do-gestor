@@ -19,6 +19,7 @@ export async function createProfile(data: any) {
       create: {
         userId: session.user.id,
         slug,
+        avatarUrl: data.avatarUrl,
         displayName: data.displayName,
         city: data.city,
         state: data.state,
@@ -33,6 +34,7 @@ export async function createProfile(data: any) {
         website: data.website,
       },
       update: {
+        avatarUrl: data.avatarUrl,
         displayName: data.displayName,
         city: data.city,
         state: data.state,
