@@ -9,12 +9,12 @@ declare module "next-auth" {
   }
 
   interface User {
-    role: string;
+    role?: string;
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
-    role: string;
+    role?: string;
   }
 }
