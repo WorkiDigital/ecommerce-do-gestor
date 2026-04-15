@@ -17,31 +17,31 @@ export default function Hero({ totalGestores = 0 }: { totalGestores?: number }) 
   const quickFilters = ["E-commerce", "Infoprodutos", "Negócio Local", "SaaS"];
 
   return (
-    <section className="relative pt-16 pb-20 sm:pt-24 sm:pb-28">
+    <section className="relative pt-20 pb-20 sm:pt-28 sm:pb-28 overflow-hidden">
       {/* Background blobs */}
-      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-br from-violet-400/30 to-blue-500/30 rounded-full blur-3xl dark:from-violet-900/30 dark:to-blue-900/30" />
-        <div className="absolute top-1/2 -left-40 w-[500px] h-[500px] bg-gradient-to-tr from-blue-400/20 to-fuchsia-400/20 rounded-full blur-3xl dark:from-blue-900/20 dark:to-fuchsia-900/20" />
+      <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-[400px] sm:w-[600px] h-[400px] sm:h-[600px] bg-gradient-to-br from-violet-400/20 to-blue-500/20 rounded-full blur-3xl dark:from-violet-900/30 dark:to-blue-900/30" />
+        <div className="absolute top-1/2 -left-40 w-[350px] sm:w-[500px] h-[350px] sm:h-[500px] bg-gradient-to-tr from-blue-400/15 to-fuchsia-400/15 rounded-full blur-3xl dark:from-blue-900/20 dark:to-fuchsia-900/20" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto text-center">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 dark:bg-violet-500/15 border border-violet-500/20 text-[12px] font-semibold text-violet-700 dark:text-violet-300 mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 dark:bg-violet-500/15 border border-violet-500/20 text-[11px] sm:text-[12px] font-semibold text-violet-700 dark:text-violet-300 mb-6">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             {totalGestores > 0 ? `${totalGestores} gestores ativos` : "Gestores verificados"} • avaliações verificadas
           </div>
 
           {/* Title */}
-          <h1 className="font-[family-name:var(--font-outfit)] text-[42px] sm:text-6xl lg:text-[72px] leading-[1.05] tracking-[-0.02em] font-extrabold text-slate-900 dark:text-white">
+          <h1 className="font-[family-name:var(--font-outfit)] text-[36px] sm:text-5xl lg:text-[72px] leading-[1.08] tracking-[-0.02em] font-extrabold text-slate-900 dark:text-white">
             Encontre o gestor de tráfego certo
-            <span className="gradient-text block">em 2 minutos</span>
+            <span className="gradient-text block mt-1">em 2 minutos</span>
           </h1>
 
           {/* Description */}
-          <p className="mt-6 text-[17px] sm:text-lg leading-relaxed text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+          <p className="mt-5 sm:mt-6 text-[15px] sm:text-lg leading-relaxed text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
             A plataforma que conecta empresas a gestores de tráfego pago com{" "}
-            <strong className="text-slate-900 dark:text-white font-semibold">
+            <strong className="text-slate-800 dark:text-white font-semibold">
               avaliações verificadas
             </strong>
             , portfólio real e contato direto no WhatsApp. Sem taxa, sem burocracia.
@@ -116,7 +116,7 @@ export default function Hero({ totalGestores = 0 }: { totalGestores?: number }) 
                 <button
                   key={filter}
                   onClick={() => router.push(`/gestores?q=${encodeURIComponent(filter)}`)}
-                  className="px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-xs font-medium hover:bg-violet-100 dark:hover:bg-violet-900/30 hover:text-violet-700 dark:hover:text-violet-300 transition"
+                  className="px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-violet-100 dark:hover:bg-violet-900/30 hover:text-violet-700 dark:hover:text-violet-300 transition"
                 >
                   {filter}
                 </button>

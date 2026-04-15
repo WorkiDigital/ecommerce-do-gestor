@@ -21,7 +21,7 @@ export default function Footer() {
               contato@trafegohub.com.br
             </a>
           </div>
-          <p className="text-[13px] text-slate-500">© 2025 TrafegoHub. Feito no Brasil 🇧🇷</p>
+          <p className="text-[13px] text-slate-500">© 2026 TrafegoHub. Feito no Brasil 🇧🇷</p>
         </div>
       </div>
     </footer>

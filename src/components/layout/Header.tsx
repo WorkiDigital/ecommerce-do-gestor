@@ -24,7 +24,7 @@ export default function Header() {
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-8 text-[15px] font-medium">
+        <div className="hidden md:flex items-center gap-8 text-[15px] font-medium text-slate-600 dark:text-slate-300">
           <Link href="/#features" className="hover:text-violet-600 dark:hover:text-violet-400 transition">
             Recursos
           </Link>
@@ -52,7 +52,7 @@ export default function Header() {
 
           <Link
             href="/login"
-            className="hidden sm:inline-flex items-center gap-2 px-4 h-9 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-sm font-semibold hover:opacity-90 transition"
+            className="inline-flex items-center gap-2 px-4 h-9 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-sm font-semibold hover:opacity-90 transition"
           >
             Entrar
           </Link>
