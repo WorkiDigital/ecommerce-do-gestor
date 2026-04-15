@@ -16,27 +16,48 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null;
+        console.log("Iniciando processo de autorização para:", credentials?.email);
+        
+        if (!process.env.AUTH_SECRET) {
+          console.error("ERRO: AUTH_SECRET não encontrada no ambiente!");
+        }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string },
-        });
+        if (!credentials?.email || !credentials?.password) {
+          console.log("Autorização falhou: Credenciais ausentes");
+          return null;
+        }
 
-        if (!user || !user.passwordHash) return null;
+        try {
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email as string },
+          });
 
-        const passwordMatch = await bcrypt.compare(
-          credentials.password as string,
-          user.passwordHash
-        );
+          if (!user || !user.passwordHash) {
+            console.log("Autorização falhou: Usuário não encontrado ou sem senha");
+            return null;
+          }
 
-        if (!passwordMatch) return null;
+          const passwordMatch = await bcrypt.compare(
+            credentials.password as string,
+            user.passwordHash
+          );
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-        };
+          if (!passwordMatch) {
+            console.log("Autorização falhou: Senha incorreta");
+            return null;
+          }
+
+          console.log("Autorização bem-sucedida para:", user.email);
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+          };
+        } catch (error: any) {
+          console.error("ERRO CRÍTICO NO AUTHORIZE:", error.message || error);
+          throw new Error("Erro de conexão com o banco de dados durante o login.");
+        }
       },
     }),
   ],
