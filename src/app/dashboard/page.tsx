@@ -39,8 +39,8 @@ export default async function DashboardPage() {
       profile={profile} 
       initialLeads={profile.leads}
       stats={{
-        views: profile.views || 0,
-        whatsappClicks: profile.whatsappClicks || 0,
+        views: (profile as any).views || 0,
+        whatsappClicks: (profile as any).whatsappClicks || 0,
         leadsCount: profile.leads.length,
         avgRating: profile.avgRating,
         reviewCount: profile.reviewCount

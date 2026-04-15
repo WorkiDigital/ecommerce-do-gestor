@@ -58,7 +58,7 @@ export async function toggleUserStatus(userId: string) {
 
     await prisma.user.update({
       where: { id: userId },
-      data: { status: user.status === "BANNED" ? "ACTIVE" : "BANNED" }
+      data: { status: ((user as any).status === "BANNED" ? "ACTIVE" : "BANNED") } as any
     });
 
     revalidatePath("/dashboard/admin");

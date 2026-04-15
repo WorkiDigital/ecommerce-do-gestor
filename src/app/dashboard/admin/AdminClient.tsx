@@ -30,7 +30,7 @@ export default function AdminClient({ initialUsers }: { initialUsers: any[] }) {
     user.profile?.displayName?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleAction = async (userId: string, profileId: string | undefined, action: "verify" | "pro" | "status") => {
+  const handleAction = async (userId: string, profileId: string | undefined, action: "verify" | "pro" | "status" | "featured") => {
     setLoadingId(`${userId}-${action}`);
     
     let result;
@@ -141,7 +141,7 @@ export default function AdminClient({ initialUsers }: { initialUsers: any[] }) {
 
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-4 text-[11px] text-slate-500">
-                      <span className="flex items-center gap-1" title="Visualizações"><Eye className="w-3 h-3" /> {user.profile?.views || 0}</span>
+                      <span className="flex items-center gap-1" title="Visualizações"><Eye className="w-3 h-3" /> {(user.profile as any)?.views || 0}</span>
                       <span className="flex items-center gap-1" title="Leads"><Users className="w-3 h-3" /> {user.profile?._count?.leads || 0}</span>
                     </div>
                   </td>

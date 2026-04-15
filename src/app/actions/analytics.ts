@@ -10,7 +10,7 @@ export async function incrementProfileViews(profileId: string) {
         views: {
           increment: 1,
         },
-      },
+      } as any,
     });
     return { success: true };
   } catch (error) {
@@ -27,7 +27,7 @@ export async function incrementWhatsappClicks(profileId: string) {
         whatsappClicks: {
           increment: 1,
         },
-      },
+      } as any,
     });
     return { success: true };
   } catch (error) {
