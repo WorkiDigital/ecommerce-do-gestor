@@ -153,12 +153,12 @@ export default function DashboardClient({ profile, initialLeads, stats }: any) {
               )}
             </div>
 
-            <button 
+            <a 
+              href="/dashboard/leads"
               className="w-full mt-6 h-11 flex items-center justify-center gap-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold shadow-lg shadow-violet-500/20 transition"
-              onClick={() => alert("Ver todos os leads em breve!")}
             >
               Ver todos os leads
-            </button>
+            </a>
           </div>
         </div>
       </div>

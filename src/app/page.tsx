@@ -19,6 +19,9 @@ export default async function Home() {
     orderBy: { avgRating: "desc" }
   });
 
+  // Contar total de gestores cadastrados
+  const totalGestores = await prisma.profile.count();
+
   // Serialização para evitar erros de data no Client Component se houver
   const gestoresData = JSON.parse(JSON.stringify(featuredGestores));
 
@@ -26,7 +29,7 @@ export default async function Home() {
     <>
       <Header />
       <main>
-        <Hero />
+        <Hero totalGestores={totalGestores} />
         <Features />
         <HowItWorks />
         <FeaturedGestores initialGestores={gestoresData} />
@@ -38,3 +41,4 @@ export default async function Home() {
     </>
   );
 }
+

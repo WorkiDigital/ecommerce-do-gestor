@@ -5,7 +5,7 @@ import { Search, UserPlus, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function Hero() {
+export default function Hero({ totalGestores = 0 }: { totalGestores?: number }) {
   const [query, setQuery] = useState("");
   const router = useRouter();
 
@@ -29,7 +29,7 @@ export default function Hero() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 dark:bg-violet-500/15 border border-violet-500/20 text-[12px] font-semibold text-violet-700 dark:text-violet-300 mb-6">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            523 gestores ativos • avaliações verificadas
+            {totalGestores > 0 ? `${totalGestores} gestores ativos` : "Gestores verificados"} • avaliações verificadas
           </div>
 
           {/* Title */}

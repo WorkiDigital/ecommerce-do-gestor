@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Zap, LayoutDashboard, UserCircle, Settings, LogOut } from "lucide-react";
+import { signOut } from "@/auth";
 
 export default function DashboardLayout({
   children,
@@ -46,10 +47,15 @@ export default function DashboardLayout({
         </nav>
 
         <div className="p-4 border-t border-slate-200 dark:border-slate-800">
-          <button className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium text-sm transition">
-            <LogOut className="w-5 h-5" />
-            Sair
-          </button>
+          <form action={async () => {
+            "use server";
+            await signOut({ redirectTo: "/login" });
+          }}>
+            <button type="submit" className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium text-sm transition">
+              <LogOut className="w-5 h-5" />
+              Sair
+            </button>
+          </form>
         </div>
       </aside>
 
