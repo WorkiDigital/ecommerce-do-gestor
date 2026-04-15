@@ -11,21 +11,9 @@ const InstagramIcon = () => (
 );
 
 
+import LeadStatusSelector from "@/components/dashboard/LeadStatusSelector";
+
 export const dynamic = "force-dynamic";
-
-const statusColors: Record<string, string> = {
-  NEW: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-  CONTACTED: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-  CLOSED: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
-  LOST: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-};
-
-const statusLabels: Record<string, string> = {
-  NEW: "Novo",
-  CONTACTED: "Contatado",
-  CLOSED: "Fechado",
-  LOST: "Perdido",
-};
 
 export default async function LeadsPage() {
   const session = await auth();
@@ -89,13 +77,7 @@ export default async function LeadsPage() {
                     <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
                       {lead.name}
                     </h3>
-                    <span
-                      className={`px-2.5 py-0.5 text-[11px] font-bold uppercase rounded-full ${
-                        statusColors[lead.status] || statusColors.NEW
-                      }`}
-                    >
-                      {statusLabels[lead.status] || lead.status}
-                    </span>
+                    <LeadStatusSelector leadId={lead.id} initialStatus={lead.status} />
                   </div>
 
                   <div className="grid sm:grid-cols-2 gap-x-8 gap-y-1.5 text-sm text-slate-600 dark:text-slate-400">
