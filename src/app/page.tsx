@@ -9,6 +9,8 @@ import Pricing from "@/components/home/Pricing";
 import FinalCTA from "@/components/home/FinalCTA";
 import prisma from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   // Buscar gestores em destaque do banco de dados real
   const featuredGestores = await prisma.profile.findMany({

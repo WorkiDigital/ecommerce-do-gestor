@@ -5,6 +5,8 @@ import prisma from "@/lib/prisma";
 import GestoresClientPage from "./GestoresClientPage";
 import { Suspense } from "react";
 
+export const dynamic = "force-dynamic";
+
 export default async function GestoresPage() {
   // Busca todos os gestores do banco real no Server Component
   const gestores = await prisma.profile.findMany({
