@@ -55,6 +55,6 @@ export default async function PerfilPage() {
           </section>
         )}
       </div>
-    </main>
+    </div>
   );
 }
