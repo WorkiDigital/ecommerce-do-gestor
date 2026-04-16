@@ -69,33 +69,20 @@ export default async function GestorPage({ params }: PageProps) {
 
   if (!gestor) notFound();
 
-  // Dados Estruturados (JSON-LD) para o Google
+  // 1. Esquema de Pessoa/Profissional
   const personSchema = {
     "@context": "https://schema.org",
-    "@type": "Person",
+    "@type": "ProfessionalService",
     "name": gestor.displayName,
     "image": gestor.avatarUrl || `${BASE_URL}/og-image.png`,
-    "jobTitle": "Gestor de Tráfego",
     "description": gestor.tagline,
+    "url": `${BASE_URL}/gestores/${slug}`,
+    "telephone": gestor.whatsapp,
     "address": {
       "@type": "PostalAddress",
       "addressLocality": gestor.city,
       "addressRegion": gestor.state,
       "addressCountry": "BR"
-    }
-  };
-
-  const serviceSchema = {
-    "@context": "https://schema.org",
-    "@type": "Service",
-    "serviceType": "Gestão de Tráfego Pago",
-    "provider": {
-      "@type": "Person",
-      "name": gestor.displayName
-    },
-    "areaServed": {
-      "@type": "Country",
-      "name": "Brasil"
     },
     "aggregateRating": {
       "@type": "AggregateRating",
@@ -103,7 +90,34 @@ export default async function GestorPage({ params }: PageProps) {
       "reviewCount": gestor.reviewCount || 1,
       "bestRating": "5",
       "worstRating": "1"
-    }
+    },
+    "priceRange": "R$"
+  };
+
+  // 2. Esquema de Breadcrumb (Trilha de Navegação)
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": BASE_URL
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Gestores",
+        "item": `${BASE_URL}/gestores`
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": gestor.displayName,
+        "item": `${BASE_URL}/gestores/${slug}`
+      }
+    ]
   };
 
   const gestorData = JSON.parse(JSON.stringify(gestor));
@@ -112,7 +126,7 @@ export default async function GestorPage({ params }: PageProps) {
   return (
     <>
       <JsonLd data={personSchema} />
-      <JsonLd data={serviceSchema} />
+      <JsonLd data={breadcrumbSchema} />
       <Header />
       <main className="flex-1">
         <GestorProfileView gestor={gestorData} reviews={reviewsData} />
