@@ -105,18 +105,18 @@ export default function Hero({ totalGestores = 0 }: { totalGestores?: number }) 
           </div>
 
           {/* Trust badges */}
-          <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-[15px] text-slate-700 dark:text-slate-400 font-medium">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-500" />
-              Sem mensalidade
+          <div className="mt-12 flex items-center justify-center gap-4 sm:gap-6 text-[13px] sm:text-[15px] text-slate-700 dark:text-slate-400 font-medium overflow-x-auto no-scrollbar whitespace-nowrap">
+            <div className="flex items-center gap-1 sm:gap-2">
+              <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 dark:text-emerald-500 shrink-0" />
+              <span>Sem mensalidade</span>
             </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-500" />
-              Contato direto
+            <div className="flex items-center gap-1 sm:gap-2">
+              <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 dark:text-emerald-500 shrink-0" />
+              <span>Contato direto</span>
             </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-500" />
-              LGPD
+            <div className="flex items-center gap-1 sm:gap-2">
+              <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 dark:text-emerald-500 shrink-0" />
+              <span>LGPD</span>
             </div>
           </div>
         </div>
