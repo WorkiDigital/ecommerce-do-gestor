@@ -98,26 +98,41 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
           </div>
         )}
 
-        {/* Tab Navigation */}
-        <div className="flex p-1.5 bg-slate-100 dark:bg-slate-800/50 rounded-2xl overflow-x-auto no-scrollbar">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all whitespace-nowrap ${
-                  activeTab === tab.id
-                    ? "bg-white dark:bg-slate-900 text-violet-600 shadow-sm"
-                    : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-                }`}
-              >
-                <Icon className="w-4 h-4" />
-                {tab.label}
-              </button>
-            );
-          })}
+        {/* Header do Form: Tabs + Save Button */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex p-1 bg-slate-100 dark:bg-slate-800/50 rounded-2xl overflow-x-auto no-scrollbar w-full sm:w-auto">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all whitespace-nowrap ${
+                    activeTab === tab.id
+                      ? "bg-white dark:bg-slate-900 text-violet-600 shadow-sm"
+                      : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex items-center gap-2 px-6 py-2.5 bg-slate-900 dark:bg-violet-600 hover:bg-slate-800 dark:hover:bg-violet-700 disabled:opacity-50 text-white text-sm font-bold rounded-xl shadow-lg transition-all scale-100 hover:scale-[1.02] active:scale-[0.98] shrink-0"
+          >
+            {loading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Save className="w-4 h-4" />
+            )}
+            SALVAR
+          </button>
         </div>
 
         {/* Tab Content */}
@@ -329,20 +344,8 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
             </div>
           )}
 
-          <div className="mt-12 flex justify-between items-center gap-4 border-t border-slate-100 dark:border-slate-800 pt-8">
-            <p className="text-sm text-slate-400 hidden sm:block">Fique tranquilo, você pode editar a qualquer momento.</p>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex items-center gap-2 px-10 py-4 bg-slate-900 dark:bg-violet-600 hover:bg-slate-800 dark:hover:bg-violet-700 disabled:opacity-50 text-white font-black rounded-2xl shadow-xl shadow-slate-900/10 dark:shadow-violet-600/20 transition-all scale-100 hover:scale-[1.02] active:scale-[0.98] w-full sm:w-auto justify-center"
-            >
-              {loading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <Save className="w-5 h-5 text-violet-400 dark:text-white" />
-              )}
-              SALVAR PERFIL
-            </button>
+          <div className="mt-8 flex items-center gap-2 text-slate-400">
+            <p className="text-xs">Fique tranquilo, você pode editar a qualquer momento.</p>
           </div>
         </div>
       </form>
