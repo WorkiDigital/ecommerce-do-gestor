@@ -11,10 +11,10 @@ export const ourFileRouter = {
       if (!session?.user) throw new Error("Unauthorized");
       return { userId: session.user.id };
     })
-    .onUploadComplete(async ({ middlewareData, file }) => {
-      console.log("Upload complete for userId:", middlewareData.userId);
+    .onUploadComplete(async ({ metadata, file }) => {
+      console.log("Upload complete for userId:", metadata.userId);
       console.log("File URL:", file.url);
-      return { uploadedBy: middlewareData.userId, url: file.url };
+      return { uploadedBy: metadata.userId, url: file.url };
     }),
 
   // Rota para imagens do portfólio
@@ -24,8 +24,8 @@ export const ourFileRouter = {
       if (!session?.user) throw new Error("Unauthorized");
       return { userId: session.user.id };
     })
-    .onUploadComplete(async ({ middlewareData, file }) => {
-      return { uploadedBy: middlewareData.userId, url: file.url };
+    .onUploadComplete(async ({ metadata, file }) => {
+      return { uploadedBy: metadata.userId, url: file.url };
     }),
 } satisfies FileRouter;
 
