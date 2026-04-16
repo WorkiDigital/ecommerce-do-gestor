@@ -113,7 +113,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
               <UploadButton
                 endpoint="profileImage"
                 onClientUploadComplete={(res) => {
-                  setFormData({ ...formData, avatarUrl: res[0].ufsUrl });
+                  setFormData({ ...formData, avatarUrl: res[0].url });
                   setMessage({ type: "success", text: "Foto enviada! Não esqueça de salvar o perfil." });
                 }}
                 onUploadError={(error: Error) => {

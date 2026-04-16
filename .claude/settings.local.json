@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs grep *)",
+      "Bash(find /c/Users/Samsung/ecommer-do-gestor -name \"*.json\" -path \"*/node_modules/*\" -exec grep -l \"uploadthing\" {} \\\\;)",
+      "Bash(find /c/Users/Samsung/ecommer-do-gestor/src -type f \\\\\\( -name \"*.ts\" -o -name \"*.tsx\" \\\\\\) -exec grep -l \"UploadButton\\\\|UploadDropzone\\\\|UploadThing\" {} \\\\;)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); deps={**d.get\\('dependencies',{}\\),**d.get\\('devDependencies',{}\\)}; [print\\(k,v\\) for k,v in deps.items\\(\\) if 'upload' in k.lower\\(\\) or 'thing' in k.lower\\(\\)]\")",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(npx prisma *)",
+      "Bash(node -e \"const lc = require\\('lightningcss'\\); console.log\\(lc.version || 'ok'\\)\")"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\Samsung\\ecommer-do-gestor\\src\\app\\api"
+    ]
+  }
+}

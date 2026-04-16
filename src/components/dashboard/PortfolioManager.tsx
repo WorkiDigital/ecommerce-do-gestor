@@ -123,7 +123,7 @@ export default function PortfolioManager({ items: initialItems }: PortfolioManag
                     <UploadButton
                       endpoint="portfolioImage"
                       onClientUploadComplete={(res) => {
-                        setFormData({ ...formData, imageUrl: res[0].ufsUrl });
+                        setFormData({ ...formData, imageUrl: res[0].url });
                       }}
                       onUploadError={(error: Error) => {
                         alert(`Erro: ${error.message}`);
