@@ -12,18 +12,8 @@ import {
 } from "recharts";
 import { useEffect, useState } from "react";
 
-// Mock data for chart
-const data = [
-  { name: "Seg", views: 15, actions: 4 },
-  { name: "Ter", views: 22, actions: 7 },
-  { name: "Qua", views: 18, actions: 5 },
-  { name: "Qui", views: 24, actions: 8 },
-  { name: "Sex", views: 16, actions: 6 },
-  { name: "Sáb", views: 19, actions: 4 },
-  { name: "Dom", views: 10, actions: 3 },
-];
-
-export default function DashboardClient({ profile, initialLeads, stats }: any) {
+export default function DashboardClient({ profile, initialLeads, stats, chartData }: any) {
+  const data = chartData ?? [];
   const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
@@ -64,9 +54,9 @@ export default function DashboardClient({ profile, initialLeads, stats }: any) {
               <Eye className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             </div>
           </div>
-          <div className="mt-4 flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+          <div className="mt-4 flex items-center gap-1.5 text-xs font-medium text-slate-500">
             <Activity className="w-3.5 h-3.5" />
-            <span>+12% esta semana</span>
+            <span>Total acumulado</span>
           </div>
         </div>
 
@@ -83,7 +73,7 @@ export default function DashboardClient({ profile, initialLeads, stats }: any) {
             </div>
           </div>
           <div className="mt-4 text-xs font-medium text-slate-500">
-            Conversão: 29,8%
+            Total acumulado
           </div>
         </div>
 
