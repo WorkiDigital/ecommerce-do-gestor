@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { Zap, LogOut, AlertCircle, UserCircle } from "lucide-react";
-import SidebarNav from "@/components/dashboard/SidebarNav";
+import { Zap, LayoutDashboard, UserCircle, Settings, LogOut, AlertCircle, ShieldCheck, Users } from "lucide-react";
 import { signOut, auth } from "@/auth";
 import prisma from "@/lib/prisma";
 
@@ -33,7 +32,45 @@ export default async function DashboardLayout({
           </Link>
         </div>
 
-        <SidebarNav isAdmin={session?.user?.role === "ADMIN" || session?.user?.email === "workidigitaloficial@gmail.com"} />
+        <nav className="flex-1 px-4 py-6 flex flex-col gap-2">
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300 font-medium text-sm"
+          >
+            <LayoutDashboard className="w-5 h-5" />
+            Visão Geral
+          </Link>
+          <Link
+            href="/dashboard/perfil"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium text-sm transition"
+          >
+            <UserCircle className="w-5 h-5" />
+            Meu Perfil
+          </Link>
+          <Link
+            href="/dashboard/leads"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium text-sm transition"
+          >
+            <Users className="w-5 h-5" />
+            Meus Leads
+          </Link>
+          <Link
+            href="/dashboard/configuracoes"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium text-sm transition"
+          >
+            <Settings className="w-5 h-5" />
+            Configurações
+          </Link>
+          {(session?.user?.role === "ADMIN" || session?.user?.email === "workidigitaloficial@gmail.com") && (
+            <Link
+              href="/dashboard/admin"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 font-medium text-sm transition mt-4"
+            >
+              <ShieldCheck className="w-5 h-5" />
+              Painel Admin
+            </Link>
+          )}
+        </nav>
 
         <div className="p-4 border-t border-slate-200 dark:border-slate-800">
           <form action={async () => {

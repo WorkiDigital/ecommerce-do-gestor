@@ -4,9 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createProfile } from "@/app/actions/profile";
 import { NICHOS, PLATAFORMAS, ESTADOS_BR } from "@/lib/constants";
-import { User, MapPin, Briefcase, Globe, MessageSquare, Save, Loader2, DollarSign, ListChecks, Upload } from "lucide-react";
-import { UploadButton } from "@/lib/uploadthing";
-import "@uploadthing/react/styles.css";
+import { User, MapPin, Briefcase, Globe, MessageSquare, Save, Loader2, DollarSign, ListChecks } from "lucide-react";
 
 const InstagramIcon = () => (
   <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
@@ -107,38 +105,20 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
               <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Preview</span>
             </div>
             
-            <div className="flex-1 space-y-4">
+            <div className="flex-1 space-y-2">
               <label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                <Upload className="w-4 h-4 text-violet-500" /> Foto de Perfil
+                <Globe className="w-4 h-4 text-violet-500" /> Link da Foto de Perfil
               </label>
-              
-              <div className="flex flex-col gap-3">
-                <UploadButton
-                  endpoint="profileImage"
-                  onClientUploadComplete={(res) => {
-                    const url = res[0].url;
-                    setFormData({ ...formData, avatarUrl: url });
-                    setMessage({ type: "success", text: "Foto enviada com sucesso! Não esqueça de salvar o perfil." });
-                  }}
-                  onUploadError={(error: Error) => {
-                    setMessage({ type: "error", text: `Erro no upload: ${error.message}` });
-                  }}
-                  appearance={{
-                    button: "ut-ready:bg-violet-600 ut-uploading:cursor-not-allowed bg-violet-500 rounded-xl text-sm font-semibold after:bg-violet-700",
-                    allowedContent: "text-[11px] text-slate-500"
-                  }}
-                  content={{
-                    button({ ready }) {
-                      if (ready) return "Escolher Foto";
-                      return "Carregando...";
-                    },
-                    allowedContent: "Imagens até 2MB"
-                  }}
-                />
-                <p className="text-[11px] text-slate-500 italic">
-                  Recomendado: Foto quadrada (aspect ratio 1:1) de alta qualidade.
-                </p>
-              </div>
+              <input
+                type="url"
+                value={formData.avatarUrl}
+                onChange={(e) => setFormData({ ...formData, avatarUrl: e.target.value })}
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-violet-500 outline-none transition"
+                placeholder="https://exemplo.com/sua-foto.jpg"
+              />
+              <p className="text-[11px] text-slate-500 italic">
+                Dica: Use links diretos do PostImage, Imgur ou redes sociais.
+              </p>
             </div>
           </div>
 
