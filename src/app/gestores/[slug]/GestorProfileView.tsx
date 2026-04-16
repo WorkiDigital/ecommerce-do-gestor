@@ -233,7 +233,7 @@ export default function GestorProfileView({
               </div>
 
               <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800">
-                <h3 className="font-semibold text-slate-900 dark:text-white mb-2">Sobre</h3>
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Sobre este gestor</h2>
                 <p className="text-[15px] text-slate-600 dark:text-slate-400 leading-relaxed">
                   {gestor.bio}
                 </p>
@@ -254,7 +254,8 @@ export default function GestorProfileView({
                         {item.imageUrl ? (
                           <img 
                             src={item.imageUrl} 
-                            alt={item.title} 
+                            alt={`Caso de Sucesso: ${item.title} - Gestor ${gestor.displayName}`} 
+                            loading="lazy"
                             className="w-full h-full object-cover group-hover:scale-105 transition duration-500" 
                           />
                         ) : (
@@ -416,32 +417,6 @@ export default function GestorProfileView({
           </div>
         </div>
 
-        {/* JSON-LD for SEO */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "LocalBusiness",
-              name: gestor.displayName,
-              description: gestor.bio,
-              image: gestor.avatarUrl,
-              address: {
-                "@type": "PostalAddress",
-                addressLocality: gestor.city,
-                addressRegion: gestor.state,
-                addressCountry: "BR",
-              },
-              aggregateRating: {
-                "@type": "AggregateRating",
-                ratingValue: gestor.avgRating,
-                reviewCount: gestor.reviewCount,
-                bestRating: 5,
-                worstRating: 1,
-              },
-            }),
-          }}
-        />
       </div>
 
       {/* Lead Capture Modal */}

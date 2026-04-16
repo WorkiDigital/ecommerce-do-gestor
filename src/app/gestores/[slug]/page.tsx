@@ -6,6 +6,7 @@ import WhatsAppFloat from "@/components/layout/WhatsAppFloat";
 import prisma from "@/lib/prisma";
 import { NICHOS } from "@/lib/constants";
 import GestorProfileView from "./GestorProfileView";
+import JsonLd from "@/components/seo/JsonLd";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -13,37 +14,43 @@ interface PageProps {
 
 export const dynamic = "force-dynamic";
 
+const BASE_URL = "https://trafegohub.workidigital.tech";
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   
   const gestor = await prisma.profile.findUnique({
     where: { slug },
-    include: {
-      portfolio: {
-        orderBy: { createdAt: "desc" }
-      }
-    }
   });
 
   if (!gestor) return { title: "Gestor não encontrado" };
 
-  const title = `${gestor.displayName} — Gestor de Tráfego ${gestor.niches.map(n => NICHOS.find(nn => nn.value === n)?.label || n).join(", ")}`;
-  const description = `⭐ ${gestor.avgRating} (${gestor.reviewCount} avaliações) • ${gestor.city}, ${gestor.state} • ${gestor.tagline}`;
+  // SEO Local: Incluir Cidade no título para ranqueamento regional
+  const nichoPrincipal = gestor.niches.length > 0 
+    ? NICHOS.find(n => n.value === gestor.niches[0])?.label 
+    : "Tráfego Pago";
+  
+  const title = `${gestor.displayName} — Gestor de ${nichoPrincipal} em ${gestor.city}${gestor.state ? `, ${gestor.state}` : ""}`;
+  const description = `⭐ ${gestor.avgRating} (${gestor.reviewCount} avaliações) • Especialista em ${gestor.niches.map(n => NICHOS.find(nn => nn.value === n)?.label || n).join(", ")}. Contato direto via WhatsApp.`;
 
   return {
     title,
     description,
+    alternates: {
+      canonical: `${BASE_URL}/gestores/${slug}`,
+    },
     openGraph: {
       title: `${gestor.displayName} | TrafegoHub`,
       description: gestor.tagline || "",
-      images: gestor.avatarUrl ? [gestor.avatarUrl] : ["/og-image.png"],
+      images: gestor.avatarUrl ? [gestor.avatarUrl] : [`${BASE_URL}/og-image.png`],
       type: "profile",
+      url: `${BASE_URL}/gestores/${slug}`,
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: gestor.avatarUrl ? [gestor.avatarUrl] : ["/og-image.png"],
+      images: gestor.avatarUrl ? [gestor.avatarUrl] : [`${BASE_URL}/og-image.png`],
     },
   };
 }
@@ -62,12 +69,50 @@ export default async function GestorPage({ params }: PageProps) {
 
   if (!gestor) notFound();
 
-  // Convertendo data do Prisma para o formato esperado pelo componente UI (serialização de datas)
+  // Dados Estruturados (JSON-LD) para o Google
+  const personSchema = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": gestor.displayName,
+    "image": gestor.avatarUrl || `${BASE_URL}/og-image.png`,
+    "jobTitle": "Gestor de Tráfego",
+    "description": gestor.tagline,
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": gestor.city,
+      "addressRegion": gestor.state,
+      "addressCountry": "BR"
+    }
+  };
+
+  const serviceSchema = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "serviceType": "Gestão de Tráfego Pago",
+    "provider": {
+      "@type": "Person",
+      "name": gestor.displayName
+    },
+    "areaServed": {
+      "@type": "Country",
+      "name": "Brasil"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": gestor.avgRating || 5,
+      "reviewCount": gestor.reviewCount || 1,
+      "bestRating": "5",
+      "worstRating": "1"
+    }
+  };
+
   const gestorData = JSON.parse(JSON.stringify(gestor));
   const reviewsData = JSON.parse(JSON.stringify(gestor.reviews));
 
   return (
     <>
+      <JsonLd data={personSchema} />
+      <JsonLd data={serviceSchema} />
       <Header />
       <main className="flex-1">
         <GestorProfileView gestor={gestorData} reviews={reviewsData} />
