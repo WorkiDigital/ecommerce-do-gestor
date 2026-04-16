@@ -42,7 +42,7 @@ export default function FinalCTA() {
             </div>
 
             {/* Social proof bar */}
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-[13px] text-slate-500">
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-[13px] text-slate-300 font-medium tracking-wide">
               <span className="flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                 100% gratuito para empresas
