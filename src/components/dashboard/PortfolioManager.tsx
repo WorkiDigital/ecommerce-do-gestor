@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Trash2, Loader2, Image as ImageIcon, TrendingUp, DollarSign, Target } from "lucide-react";
+import { Plus, Trash2, Loader2, Image as ImageIcon, TrendingUp, DollarSign, Target, Upload } from "lucide-react";
 import { addPortfolioItem, deletePortfolioItem } from "@/app/actions/portfolio";
+import { UploadButton } from "@/lib/uploadthing";
 
 interface PortfolioItem {
   id: string;
@@ -108,14 +109,36 @@ export default function PortfolioManager({ items: initialItems }: PortfolioManag
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">URL da Imagem (Opcional)</label>
-                  <input
-                    type="url"
-                    value={formData.imageUrl}
-                    onChange={e => setFormData({ ...formData, imageUrl: e.target.value })}
-                    placeholder="Cole o link de um print de resultados"
-                    className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 outline-none focus:ring-2 focus:ring-violet-500"
-                  />
+                  <label className="text-sm font-medium flex items-center gap-2">
+                    <Upload className="w-4 h-4 text-violet-500" /> Print do Resultado
+                  </label>
+                  <div className="flex items-center gap-3 p-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
+                    <div className="shrink-0 w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 overflow-hidden flex items-center justify-center">
+                      {formData.imageUrl ? (
+                        <img src={formData.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                      ) : (
+                        <ImageIcon className="w-5 h-5 text-slate-300" />
+                      )}
+                    </div>
+                    <UploadButton
+                      endpoint="portfolioImage"
+                      onClientUploadComplete={(res) => {
+                        setFormData({ ...formData, imageUrl: res[0].ufsUrl });
+                      }}
+                      onUploadError={(error: Error) => {
+                        alert(`Erro: ${error.message}`);
+                      }}
+                      appearance={{
+                        button: "ut-ready:bg-slate-900 dark:ut-ready:bg-white ut-ready:text-white dark:ut-ready:text-slate-900 bg-slate-100 text-slate-600 rounded-lg text-xs font-semibold px-3 py-2 h-auto w-auto",
+                        allowedContent: "hidden",
+                      }}
+                      content={{
+                        button({ ready }) {
+                          return ready ? (formData.imageUrl ? "Trocar Imagem" : "Subir Foto") : "Aguarde...";
+                        },
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
 
