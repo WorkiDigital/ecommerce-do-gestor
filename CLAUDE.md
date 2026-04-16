@@ -29,6 +29,20 @@
     *   **Filtros no Banco**: Busca, Nicho e Plataforma agora são processados via Query SQL, não mais no cliente.
     *   **Hero Section**: Animações de borda rítmicas e botão de busca mobile otimizado.
 *   **Atenção**: 
-    *   Evitar links externos (Imgur/PostImage) devido a instabilidade; priorizar integração futura com **UploadThing**.
+    *   **UploadThing integrado** (`@uploadthing/react` v7): endpoints `profileImage` (2MB) e `portfolioImage` (4MB) em `src/app/api/uploadthing/core.ts`. Helper tipado em `src/lib/uploadthing.ts`. URL final disponível em `res[0].ufsUrl`.
     *   **Next.js 15+**: Acessar `params` e `searchParams` sempre de forma assíncrona (`await`).
     *   **Destaques**: A Query do marketplace prioriza gestores com `isFeatured: true` e depois aplica o `orderBy` selecionado.
+
+## ⚠️ Regra Crítica — CSS de Terceiros com Tailwind v4
+
+**Problema**: No Tailwind v4, todas as utilities ficam dentro de `@layer utilities`. CSS externo importado **sem layer** (ex: `@import "lib/styles.css"`) fica **fora de qualquer layer** e tem **prioridade maior** que o `@layer utilities` do Tailwind — isso faz `.hidden` de terceiros sobrescrever `md:flex`, quebrando layouts responsivos.
+
+**Solução obrigatória**: Sempre importar CSS de terceiros com a sintaxe `layer()`:
+```css
+/* globals.css — ORDEM IMPORTA */
+@import "terceiro/styles.css" layer(nome-do-layer);  /* ← baixa prioridade */
+@import "tailwindcss";                                /* ← utilities ganham */
+```
+O layer declarado primeiro tem prioridade MENOR. Assim `@layer utilities` do Tailwind sempre vence.
+
+**Caso real resolvido**: `@uploadthing/react/styles.css` definia `.hidden { display: none }` que sobrescrevia `md:flex` do sidebar. Fix: `@import "@uploadthing/react/styles.css" layer(ut-styles)` em `src/app/globals.css`.
