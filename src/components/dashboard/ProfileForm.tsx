@@ -27,6 +27,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [activeTab, setActiveTab] = useState<"basic" | "specialties" | "contact">("basic");
 
   const [formData, setFormData] = useState({
     displayName: initialData?.displayName || "",
@@ -42,6 +43,9 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
     website: initialData?.website || "",
     niches: initialData?.niches || [],
     platforms: initialData?.platforms || [],
+    avgRating: initialData?.avgRating || 5.0,
+    reviewCount: initialData?.reviewCount || 0,
+    badge: initialData?.badge || "NOVO",
   });
 
   const handleToggleArray = (field: "niches" | "platforms", value: string) => {
@@ -63,7 +67,6 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
     if (result.success) {
       setMessage({ type: "success", text: "Perfil atualizado com sucesso!" });
       router.refresh();
-      // Scroll to top to see message
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       setMessage({ type: "error", text: result.error || "Erro ao atualizar perfil." });
@@ -72,280 +75,297 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
     setLoading(false);
   };
 
+  const tabs = [
+    { id: "basic", label: "Informações Básicas", icon: User },
+    { id: "specialties", label: "Especialidades", icon: Briefcase },
+    { id: "contact", label: "Contatos e Redes", icon: MessageSquare },
+  ] as const;
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
-      {message && (
-        <div
-          className={`p-4 rounded-xl border ${
-            message.type === "success"
-              ? "bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400"
-              : "bg-red-50 border-red-200 text-red-700 dark:bg-red-500/10 dark:border-red-500/20 dark:text-red-400"
-          }`}
-        >
-          {message.text}
-        </div>
-      )}
-
-      {/* Seção Básica */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
-        <h3 className="text-lg font-semibold mb-6 flex items-center gap-2">
-          <User className="w-5 h-5 text-violet-600" />
-          Informações Básicas
-        </h3>
-        
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="md:col-span-2 flex flex-col md:flex-row gap-6 p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800">
-            <div className="shrink-0 flex flex-col items-center gap-2">
-              <div className="w-24 h-24 rounded-2xl bg-white dark:bg-slate-900 overflow-hidden border-2 border-slate-200 dark:border-slate-800 shadow-inner flex items-center justify-center">
-                {formData.avatarUrl ? (
-                  <img src={formData.avatarUrl} alt="Preview" className="w-full h-full object-cover" />
-                ) : (
-                  <User className="w-10 h-10 text-slate-300" />
-                )}
-              </div>
-              <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Preview</span>
-            </div>
-            
-            <div className="flex-1 space-y-3">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
-                <Upload className="w-4 h-4 text-violet-500" /> Foto de Perfil
-              </label>
-              <UploadButton
-                endpoint="profileImage"
-                onClientUploadComplete={(res) => {
-                  setFormData({ ...formData, avatarUrl: res[0].url });
-                  setMessage({ type: "success", text: "Foto enviada! Não esqueça de salvar o perfil." });
-                }}
-                onUploadError={(error: Error) => {
-                  setMessage({ type: "error", text: `Erro no upload: ${error.message}` });
-                }}
-                appearance={{
-                  button: "ut-ready:bg-violet-600 ut-uploading:cursor-not-allowed bg-violet-500 rounded-xl text-sm font-semibold after:bg-violet-700",
-                  allowedContent: "text-[11px] text-slate-500",
-                }}
-                content={{
-                  button({ ready }) { return ready ? "Escolher Foto" : "Carregando..."; },
-                  allowedContent: "Imagens até 2MB",
-                }}
-              />
-              <p className="text-[11px] text-slate-500 italic">
-                Recomendado: Foto quadrada (aspect ratio 1:1) de alta qualidade.
-              </p>
-            </div>
+    <div className="flex flex-col lg:flex-row gap-8 items-start">
+      {/* Coluna do Formulário */}
+      <form onSubmit={handleSubmit} className="flex-1 w-full space-y-6">
+        {message && (
+          <div
+            className={`p-4 rounded-2xl border ${
+              message.type === "success"
+                ? "bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400"
+                : "bg-red-50 border-red-200 text-red-700 dark:bg-red-500/10 dark:border-red-500/20 dark:text-red-400"
+            }`}
+          >
+            {message.text}
           </div>
+        )}
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Nome de Exibição</label>
-            <input
-              type="text"
-              required
-              value={formData.displayName}
-              onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-violet-500 outline-none transition"
-              placeholder="Ex: João da Silva"
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Frase de Efeito (Tagline)</label>
-            <input
-              type="text"
-              required
-              value={formData.tagline}
-              onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-violet-500 outline-none transition"
-              placeholder="Ex: Especialista em Google Ads para Imobiliárias"
-            />
-          </div>
-
-          <div className="md:col-span-2 space-y-2">
-            <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Bio / Descrição Profissional</label>
-            <textarea
-              required
-              rows={4}
-              value={formData.bio}
-              onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 focus:ring-2 focus:ring-violet-500 outline-none transition resize-none"
-              placeholder="Conte sua experiência, resultados e como você trabalha..."
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Localização e Preço */}
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
-          <h3 className="text-lg font-semibold mb-6 flex items-center gap-2">
-            <MapPin className="w-5 h-5 text-blue-600" />
-            Localização
-          </h3>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="col-span-2 space-y-2">
-              <label className="text-sm font-medium">Cidade</label>
-              <input
-                type="text"
-                value={formData.city}
-                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">UF</label>
-              <select
-                value={formData.state}
-                onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 outline-none focus:ring-2 focus:ring-blue-500"
+        {/* Tab Navigation */}
+        <div className="flex p-1.5 bg-slate-100 dark:bg-slate-800/50 rounded-2xl overflow-x-auto no-scrollbar">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all whitespace-nowrap ${
+                  activeTab === tab.id
+                    ? "bg-white dark:bg-slate-900 text-violet-600 shadow-sm"
+                    : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                }`}
               >
-                {ESTADOS_BR.map(uf => <option key={uf} value={uf}>{uf}</option>)}
-              </select>
+                <Icon className="w-4 h-4" />
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Tab Content */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[32px] p-8 shadow-sm">
+          {activeTab === "basic" && (
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="flex flex-col md:flex-row gap-8 items-center p-6 bg-slate-50 dark:bg-slate-950/50 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
+                <div className="shrink-0 relative">
+                  <div className="w-24 h-24 rounded-3xl bg-white dark:bg-slate-900 overflow-hidden border-2 border-slate-100 dark:border-slate-800 shadow-inner flex items-center justify-center">
+                    {formData.avatarUrl ? (
+                      <img src={formData.avatarUrl} alt="Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <User className="w-10 h-10 text-slate-300" />
+                    )}
+                  </div>
+                  <div className="absolute -bottom-2 -right-2 p-2 bg-violet-600 rounded-xl text-white shadow-lg">
+                    <Upload className="w-4 h-4" />
+                  </div>
+                </div>
+                
+                <div className="flex-1 space-y-4 text-center md:text-left">
+                  <div>
+                    <h4 className="font-bold text-slate-900 dark:text-white">Foto de Perfil</h4>
+                    <p className="text-sm text-slate-500">Imagens até 2MB. Recomendado: 400x400.</p>
+                  </div>
+                  <UploadButton
+                    endpoint="profileImage"
+                    onClientUploadComplete={(res) => {
+                      setFormData({ ...formData, avatarUrl: res[0].url });
+                      setMessage({ type: "success", text: "Foto atualizada!" });
+                    }}
+                    onUploadError={(error: Error) => {
+                      setMessage({ type: "error", text: `Erro: ${error.message}` });
+                    }}
+                    appearance={{
+                      button: "ut-ready:bg-violet-600 ut-uploading:cursor-not-allowed bg-violet-500 rounded-xl text-xs font-bold px-6 py-2.5 h-auto after:bg-violet-700 transition-all",
+                      allowedContent: "hidden",
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-xs uppercase font-black text-slate-400 dark:text-slate-600 tracking-widest px-1">Nome de Exibição / Agência</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.displayName}
+                    onChange={(e) => setFormData({ ...formData, displayName: e.target.value })}
+                    className="w-full px-5 py-3.5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 focus:ring-2 focus:ring-violet-500 outline-none transition-all font-medium"
+                    placeholder="Como você quer ser chamado"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-xs uppercase font-black text-slate-400 dark:text-slate-600 tracking-widest px-1">Tagline Profissional</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.tagline}
+                    onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
+                    className="w-full px-5 py-3.5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 focus:ring-2 focus:ring-violet-500 outline-none transition-all font-medium"
+                    placeholder="Ex: Especialista em ROI 5x"
+                  />
+                </div>
+
+                <div className="md:col-span-2 space-y-2">
+                  <label className="text-xs uppercase font-black text-slate-400 dark:text-slate-600 tracking-widest px-1">Minha Bio / Sobre</label>
+                  <textarea
+                    required
+                    rows={4}
+                    value={formData.bio}
+                    onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                    className="w-full px-5 py-3.5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 focus:ring-2 focus:ring-violet-500 outline-none transition-all resize-none"
+                    placeholder="Conte sua história e seus melhores resultados..."
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs uppercase font-black text-slate-400 dark:text-slate-600 tracking-widest px-1">Cidade</label>
+                  <input
+                    type="text"
+                    value={formData.city}
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    className="w-full px-5 py-3.5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 focus:ring-2 focus:ring-violet-500 outline-none transition-all"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs uppercase font-black text-slate-400 dark:text-slate-600 tracking-widest px-1">Estado</label>
+                  <select
+                    value={formData.state}
+                    onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                    className="w-full px-5 py-3.5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 focus:ring-2 focus:ring-violet-500 outline-none transition-all"
+                  >
+                    {ESTADOS_BR.map(uf => <option key={uf} value={uf}>{uf}</option>)}
+                  </select>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
-          <h3 className="text-lg font-semibold mb-6 flex items-center gap-2">
-            <DollarSign className="w-5 h-5 text-emerald-600" />
-            Investimento Mínimo
-          </h3>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">A partir de (R$)</label>
-            <input
-              type="number"
-              value={formData.minPrice}
-              onChange={(e) => setFormData({ ...formData, minPrice: Number(e.target.value) })}
-              className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 outline-none focus:ring-2 focus:ring-emerald-500"
-            />
-            <p className="text-[11px] text-slate-500">Valor mensal aproximado que você cobra para gerenciar uma conta.</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Nichos e Plataformas */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
-        <h3 className="text-lg font-semibold mb-6 flex items-center gap-2">
-          <Briefcase className="w-5 h-5 text-amber-600" />
-          Especialidades
-        </h3>
-        
-        <div className="space-y-8">
-          <div>
-            <label className="text-sm font-bold mb-4 block text-slate-900 dark:text-white">Seus Nichos de Atuação</label>
-            <div className="flex flex-wrap gap-2">
-              {NICHOS.map((niche) => (
-                <button
-                  key={niche.value}
-                  type="button"
-                  onClick={() => handleToggleArray("niches", niche.label)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                    formData.niches.includes(niche.label)
-                      ? "bg-violet-600 text-white shadow-lg shadow-violet-600/20"
-                      : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200"
-                  }`}
-                >
-                  {niche.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label className="text-sm font-bold mb-4 block text-slate-900 dark:text-white">Plataformas que Domina</label>
-            <div className="flex flex-wrap gap-2">
-              {PLATAFORMAS.map((p) => (
-                <button
-                  key={p.value}
-                  type="button"
-                  onClick={() => handleToggleArray("platforms", p.label)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                    formData.platforms.includes(p.label)
-                      ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
-                      : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200"
-                  }`}
-                >
-                  {p.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Links de Contato */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
-        <h3 className="text-lg font-semibold mb-6 flex items-center gap-2">
-          <MessageSquare className="w-5 h-5 text-blue-500" />
-          Contatos e Redes Sociais
-        </h3>
-        
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="text-sm font-medium flex items-center gap-2">
-              <MessageSquare className="w-4 h-4 text-emerald-500" /> WhatsApp
-            </label>
-            <input
-              type="text"
-              value={formData.whatsapp}
-              onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
-              className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 outline-none focus:ring-2 focus:ring-emerald-500"
-              placeholder="(00) 00000-0000"
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <label className="text-sm font-medium flex items-center gap-2">
-              <InstagramIcon /> Instagram
-            </label>
-            <input
-              type="text"
-              value={formData.instagram}
-              onChange={(e) => setFormData({ ...formData, instagram: e.target.value })}
-              className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 outline-none focus:ring-2 focus:ring-pink-500"
-              placeholder="@seu.perfil"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium flex items-center gap-2">
-              <FacebookIcon /> Facebook
-            </label>
-            <input
-              type="text"
-              value={formData.facebook}
-              onChange={(e) => setFormData({ ...formData, facebook: e.target.value })}
-              className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="facebook.com/seu-perfil"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium flex items-center gap-2">
-              <Globe className="w-4 h-4 text-slate-500" /> Website / Portfólio
-            </label>
-            <input
-              type="url"
-              value={formData.website}
-              onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-              className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 outline-none focus:ring-2 focus:ring-violet-500"
-              placeholder="https://meusite.com"
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="flex justify-end pt-4">
-        <button
-          type="submit"
-          disabled={loading}
-          className="flex items-center gap-2 px-8 py-3 bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white font-bold rounded-2xl shadow-lg shadow-violet-600/20 transition-all scale-100 hover:scale-[1.02] active:scale-[0.98]"
-        >
-          {loading ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
-          ) : (
-            <Save className="w-5 h-5" />
           )}
-          {initialData ? "Salvar Alterações" : "Criar Perfil Profissional"}
-        </button>
-      </div>
-    </form>
+
+          {activeTab === "specialties" && (
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="space-y-4">
+                <label className="text-xs uppercase font-black text-slate-400 dark:text-slate-600 tracking-widest px-1 block">Valor Mínimo para Gestão (Mensal)</label>
+                <div className="relative">
+                  <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <input
+                    type="number"
+                    value={formData.minPrice}
+                    onChange={(e) => setFormData({ ...formData, minPrice: Number(e.target.value) })}
+                    className="w-full pl-12 pr-5 py-3.5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 focus:ring-2 focus:ring-emerald-500 outline-none transition-all font-bold text-lg"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <label className="text-xs uppercase font-black text-slate-400 dark:text-slate-600 tracking-widest px-1 mb-4 block">Nichos de Atuação</label>
+                  <div className="flex flex-wrap gap-2">
+                    {NICHOS.map((niche) => (
+                      <button
+                        key={niche.value}
+                        type="button"
+                        onClick={() => handleToggleArray("niches", niche.label)}
+                        className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                          formData.niches.includes(niche.label)
+                            ? "bg-violet-600 text-white shadow-lg shadow-violet-600/20"
+                            : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200"
+                        }`}
+                      >
+                        {niche.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs uppercase font-black text-slate-400 dark:text-slate-600 tracking-widest px-1 mb-4 block">Plataformas Dominadas</label>
+                  <div className="flex flex-wrap gap-2">
+                    {PLATAFORMAS.map((p) => (
+                      <button
+                        key={p.value}
+                        type="button"
+                        onClick={() => handleToggleArray("platforms", p.label)}
+                        className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                          formData.platforms.includes(p.label)
+                            ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
+                            : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200"
+                        }`}
+                      >
+                        {p.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "contact" && (
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-xs uppercase font-black text-slate-400 dark:text-slate-600 tracking-widest px-1">WhatsApp direto</label>
+                  <input
+                    type="text"
+                    value={formData.whatsapp}
+                    onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
+                    className="w-full px-5 py-3.5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
+                    placeholder="(00) 00000-0000"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-xs uppercase font-black text-slate-400 dark:text-slate-600 tracking-widest px-1">Username Instagram</label>
+                  <input
+                    type="text"
+                    value={formData.instagram}
+                    onChange={(e) => setFormData({ ...formData, instagram: e.target.value })}
+                    className="w-full px-5 py-3.5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 focus:ring-2 focus:ring-pink-500 outline-none transition-all"
+                    placeholder="@seu.perfil"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs uppercase font-black text-slate-400 dark:text-slate-600 tracking-widest px-1">URL Facebook</label>
+                  <input
+                    type="text"
+                    value={formData.facebook}
+                    onChange={(e) => setFormData({ ...formData, facebook: e.target.value })}
+                    className="w-full px-5 py-3.5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 focus:ring-2 focus:ring-blue-600 outline-none transition-all"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs uppercase font-black text-slate-400 dark:text-slate-600 tracking-widest px-1">Website / Link Externo</label>
+                  <input
+                    type="url"
+                    value={formData.website}
+                    onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                    className="w-full px-5 py-3.5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 focus:ring-2 focus:ring-violet-500 outline-none transition-all"
+                    placeholder="https://meusite.com"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="mt-12 flex justify-between items-center gap-4 border-t border-slate-100 dark:border-slate-800 pt-8">
+            <p className="text-sm text-slate-400 hidden sm:block">Fique tranquilo, você pode editar a qualquer momento.</p>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex items-center gap-2 px-10 py-4 bg-slate-900 dark:bg-violet-600 hover:bg-slate-800 dark:hover:bg-violet-700 disabled:opacity-50 text-white font-black rounded-2xl shadow-xl shadow-slate-900/10 dark:shadow-violet-600/20 transition-all scale-100 hover:scale-[1.02] active:scale-[0.98] w-full sm:w-auto justify-center"
+            >
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <Save className="w-5 h-5 text-violet-400 dark:text-white" />
+              )}
+              SALVAR PERFIL
+            </button>
+          </div>
+        </div>
+      </form>
+
+      {/* Coluna da Prévia */}
+      <aside className="lg:w-80 w-full space-y-6 lg:sticky lg:top-24">
+        <div className="flex items-center justify-between px-2">
+          <h4 className="text-xs uppercase font-black text-slate-400 tracking-widest">Prévia no Marketplace</h4>
+          <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+        </div>
+        
+        <div className="pointer-events-none opacity-90 scale-95 lg:scale-100 origin-top">
+          <GestorCard gestor={formData as any} />
+        </div>
+
+        <div className="p-6 bg-violet-600/5 dark:bg-violet-500/5 rounded-[28px] border border-violet-600/10 dark:border-violet-500/10">
+          <h5 className="text-sm font-bold text-violet-600 dark:text-violet-400 mb-2">Dica de Especialista</h5>
+          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+            Perfis com foto de alta qualidade e uma Tagline clara convertem até **47% mais** no TrafegoHub.
+          </p>
+        </div>
+      </aside>
+    </div>
+  );
+}
   );
 }
