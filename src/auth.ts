@@ -48,12 +48,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             return null;
           }
 
+          // LÓGICA DE PROMOÇÃO AUTOMÁTICA PARA ADMIN MASTER
+          let currentRole = user.role;
+          if (user.email === "workidigitaloficial@gmail.com" && user.role !== "ADMIN") {
+            console.log("Promovendo usuário master para ADMIN no banco de dados...");
+            const updatedUser = await prisma.user.update({
+              where: { id: user.id },
+              data: { role: "ADMIN" }
+            });
+            currentRole = updatedUser.role;
+          }
+
           console.log("Autorização bem-sucedida para:", user.email);
           return {
             id: user.id,
             email: user.email,
             name: user.name,
-            role: user.role,
+            role: currentRole,
           };
         } catch (error: any) {
           console.error("ERRO CRÍTICO NO AUTHORIZE:", error.message || error);

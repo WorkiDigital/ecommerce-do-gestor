@@ -25,8 +25,10 @@
 
 ## 📝 Estado Atual & Regras
 *   **Melhorias Recentes**:
-    *   Hero Section modernizada com animações de borda rítmicas.
-    *   Barra de busca mobile otimizada (Botão de largura total com alto contraste).
-    *   Sistema de "Destaques" ativo (Filtra por `isFeatured: true`).
-*   **Atenção**: Evitar links externos (Imgur/PostImage) devido a instabilidade; priorizar integração futura com **UploadThing**.
-*   **Next.js 15+**: Acessar `params` sempre de forma assíncrona (`await params`) para evitar erros de renderização.
+    *   **Paginação & Escalabilidade**: Marketplace refatorado para Server-Side (Prisma `skip`/`take`). Navegação via URL (`?page=X`) com componente de paginação dedicado.
+    *   **Filtros no Banco**: Busca, Nicho e Plataforma agora são processados via Query SQL, não mais no cliente.
+    *   **Hero Section**: Animações de borda rítmicas e botão de busca mobile otimizado.
+*   **Atenção**: 
+    *   Evitar links externos (Imgur/PostImage) devido a instabilidade; priorizar integração futura com **UploadThing**.
+    *   **Next.js 15+**: Acessar `params` e `searchParams` sempre de forma assíncrona (`await`).
+    *   **Destaques**: A Query do marketplace prioriza gestores com `isFeatured: true` e depois aplica o `orderBy` selecionado.

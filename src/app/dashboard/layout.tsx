@@ -61,7 +61,7 @@ export default async function DashboardLayout({
             <Settings className="w-5 h-5" />
             Configurações
           </Link>
-          {session?.user?.role === "ADMIN" && (
+          {(session?.user?.role === "ADMIN" || session?.user?.email === "workidigitaloficial@gmail.com") && (
             <Link
               href="/dashboard/admin"
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 font-medium text-sm transition mt-4"
