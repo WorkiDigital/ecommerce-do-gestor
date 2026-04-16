@@ -351,7 +351,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
       </form>
 
       {/* Coluna da Prévia */}
-      <aside className="lg:w-80 w-full space-y-6 lg:sticky lg:top-24">
+      <aside className="lg:w-[400px] w-full space-y-6 lg:sticky lg:top-24">
         <div className="flex items-center justify-between px-2">
           <h4 className="text-xs uppercase font-black text-slate-400 tracking-widest">Prévia no Marketplace</h4>
           <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
