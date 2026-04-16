@@ -5,27 +5,28 @@
 *   **Build**: `npm run build`
 *   **Lint**: `npm run lint`
 *   **Banco de Dados**:
-    *   Sincronizar Schema: `npx prisma db push` (Uso obrigatório após mudar o .prisma)
+    *   Sincronizar Schema: `npx prisma db push`
     *   Gerar Types: `npx prisma generate`
+    *   Executar SQL (VPS): `npx prisma db execute --stdin <<EOF ... EOF`
     *   Visualizar Dados: `npx prisma studio`
 
 ## 🎨 Guia de Design (Design System)
-*   **Estética**: Premium SaaS Moderno (Dark-mode first / High Contrast).
+*   **Estética**: Premium SaaS Moderno (Acessibilidade WCAG / High Contrast).
 *   **Cores**: 
-    *   Base: `Slate` (Ardósia).
-    *   Destaque: Gradiente `Violet-600` para `Blue-600`.
-    *   Status: `Emerald` (Sucesso), `Amber` (PRO/Premium), `Red` (Alerta).
-*   **Fontes**: `Outfit` (Display/Títulos), `Inter` (Corpo de texto).
-*   **Componentes**: Uso intensivo de `backdrop-blur`, gradientes suaves e micro-animações.
+    *   Base: `Slate` (Ardósia 800/900 no Light Mode).
+    *   Destaque: Gradiente `Blue-700` para `Indigo-700` (Substituiu o Violeta).
+    *   Busca: Borda animada conica (Neon) e efeito Typewriter no placeholder.
+*   **Fontes**: `Outfit` (Títulos), `Inter` (Corpo).
 
 ## 🚀 Infraestrutura & Deployment
 *   **Framework**: Next.js 16.2.3 (Turbopack).
-*   **Deploy**: Easypanel (Docker).
-*   **Banco**: PostgreSQL (Prisma ORM).
-*   **Estratégia**: Rotas sensíveis ao Banco (`sitemap.xml`, `robots.txt`) estão configuradas como `force-dynamic` para evitar erros de conexão durante o build no Easypanel.
+*   **Deploy**: Docker / VPS.
+*   **Resiliência**: Fallback de UI implementado na Home (`try/catch` no Prisma) para evitar crash caso o banco na VPS esteja inacessível.
 
 ## 📝 Estado Atual & Regras
-*   **Type Casting**: Em caso de dessincronização entre o gerador do Prisma e o compilador Next durante o build, usar `as any` em métricas e status para garantir a estabilidade do pipeline de deploy.
-*   **SEO**: SEO Master implementado com metadados dinâmicos e OpenGraph.
-*   **CRM**: Mini-CRM funcional para gestores acompanharem leads via painel `/dashboard/leads`.
-*   **Admin**: Painel administrativo acessível em `/dashboard/admin` para moderação e verificação de usuários.
+*   **Melhorias Recentes**:
+    *   Hero Section modernizada com animações de borda rítmicas.
+    *   Barra de busca mobile otimizada (Botão de largura total com alto contraste).
+    *   Sistema de "Destaques" ativo (Filtra por `isFeatured: true`).
+*   **Atenção**: Evitar links externos (Imgur/PostImage) devido a instabilidade; priorizar integração futura com **UploadThing**.
+*   **Next.js 15+**: Acessar `params` sempre de forma assíncrona (`await params`) para evitar erros de renderização.
