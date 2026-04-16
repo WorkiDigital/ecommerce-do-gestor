@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { Zap, LogOut, AlertCircle } from "lucide-react";
+import { Zap, LogOut, AlertCircle, UserCircle } from "lucide-react";
 import SidebarNav from "@/components/dashboard/SidebarNav";
-import MobileNav from "@/components/dashboard/MobileNav";
 import { signOut, auth } from "@/auth";
 import prisma from "@/lib/prisma";
 
@@ -59,7 +58,9 @@ export default async function DashboardLayout({
             TrafegoHub
           </span>
         </Link>
-        <MobileNav isAdmin={session?.user?.role === "ADMIN" || session?.user?.email === "workidigitaloficial@gmail.com"} />
+        <button className="w-8 h-8 grid place-items-center rounded-lg bg-slate-100 dark:bg-slate-800">
+          <UserCircle className="w-5 h-5" />
+        </button>
       </div>
 
       {/* Main Content Area */}

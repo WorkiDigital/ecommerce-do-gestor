@@ -17,7 +17,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        console.log("Iniciando processo de autorização para:", credentials?.email);
+        
+        if (!process.env.AUTH_SECRET) {
+          console.error("ERRO: AUTH_SECRET não encontrada no ambiente!");
+        }
+
         if (!credentials?.email || !credentials?.password) {
+          console.log("Autorização falhou: Credenciais ausentes");
           return null;
         }
 
@@ -27,6 +34,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           });
 
           if (!user || !user.passwordHash) {
+            console.log("Autorização falhou: Usuário não encontrado ou sem senha");
             return null;
           }
 
@@ -36,12 +44,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           );
 
           if (!passwordMatch) {
+            console.log("Autorização falhou: Senha incorreta");
             return null;
           }
 
           // LÓGICA DE PROMOÇÃO AUTOMÁTICA PARA ADMIN MASTER
           let currentRole = user.role;
           if (user.email === "workidigitaloficial@gmail.com" && user.role !== "ADMIN") {
+            console.log("Promovendo usuário master para ADMIN no banco de dados...");
             const updatedUser = await prisma.user.update({
               where: { id: user.id },
               data: { role: "ADMIN" }
@@ -49,6 +59,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             currentRole = updatedUser.role;
           }
 
+          console.log("Autorização bem-sucedida para:", user.email);
           return {
             id: user.id,
             email: user.email,
@@ -56,6 +67,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             role: currentRole,
           };
         } catch (error: any) {
+          console.error("ERRO CRÍTICO NO AUTHORIZE:", error.message || error);
           throw new Error("Erro de conexão com o banco de dados durante o login.");
         }
       },
