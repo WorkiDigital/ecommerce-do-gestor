@@ -62,6 +62,10 @@ export const metadata: Metadata = {
     description: "Conecte-se com os melhores profissionais de tráfego pago do Brasil. Contato direto via WhatsApp.",
     images: ["/og-image.png"],
   },
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({
