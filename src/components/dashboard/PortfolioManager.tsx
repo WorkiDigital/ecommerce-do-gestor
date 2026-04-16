@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Plus, Trash2, Loader2, Image as ImageIcon, TrendingUp, DollarSign, Target, Upload } from "lucide-react";
 import { addPortfolioItem, deletePortfolioItem } from "@/app/actions/portfolio";
 import { UploadButton } from "@/lib/uploadthing";
+import "@uploadthing/react/styles.css";
 
 interface PortfolioItem {
   id: string;

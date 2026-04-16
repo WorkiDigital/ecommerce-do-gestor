@@ -6,6 +6,7 @@ import { createProfile } from "@/app/actions/profile";
 import { NICHOS, PLATAFORMAS, ESTADOS_BR } from "@/lib/constants";
 import { User, MapPin, Briefcase, Globe, MessageSquare, Save, Loader2, DollarSign, ListChecks, Upload } from "lucide-react";
 import { UploadButton } from "@/lib/uploadthing";
+import "@uploadthing/react/styles.css";
 
 const InstagramIcon = () => (
   <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
