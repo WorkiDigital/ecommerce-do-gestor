@@ -28,6 +28,7 @@
     *   **Paginação & Escalabilidade**: Marketplace refatorado para Server-Side (Prisma `skip`/`take`). Navegação via URL (`?page=X`) com componente de paginação dedicado.
     *   **Filtros no Banco**: Busca, Nicho e Plataforma agora são processados via Query SQL, não mais no cliente.
     *   **Hero Section**: Animações de borda rítmicas e botão de busca mobile otimizado.
+    *   **Layout da Página de Perfil** (`src/app/dashboard/perfil/page.tsx`): usa `max-w-7xl` (não `max-w-5xl`). O `ProfileForm` tem layout 2 colunas (`flex-1` form + `lg:w-[400px]` prévia sticky). Não reduzir esses valores.
 *   **Atenção**: 
     *   **UploadThing integrado** (`@uploadthing/react` v7): endpoints `profileImage` (2MB) e `portfolioImage` (4MB) em `src/app/api/uploadthing/core.ts`. Helper tipado em `src/lib/uploadthing.ts`. URL final disponível em `res[0].ufsUrl`.
     *   **Next.js 15+**: Acessar `params` e `searchParams` sempre de forma assíncrona (`await`).
