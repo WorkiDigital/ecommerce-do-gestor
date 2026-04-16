@@ -5,32 +5,64 @@ import WhatsAppFloat from "@/components/layout/WhatsAppFloat";
 import prisma from "@/lib/prisma";
 import GestoresClientPage from "./GestoresClientPage";
 import { Suspense } from "react";
+import { NICHOS, PLATAFORMAS } from "@/lib/constants";
+import JsonLd from "@/components/seo/JsonLd";
 
-export const metadata: Metadata = {
-  title: "Encontre os Melhores Gestores de Tráfego",
-  description: "Explore nosso marketplace de gestores de tráfego pago. Filtre por nicho, plataforma e veja avaliações reais antes de contratar.",
-  openGraph: {
-    title: "Marketplace de Gestores de Tráfego — TrafegoHub",
-    description: "Contrate especialistas certificados em Google Ads, Meta Ads e mais. Portfólio verificado.",
-    type: "website",
-  },
-};
+interface PageProps {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+const BASE_URL = "https://trafegohub.workidigital.tech";
+
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  const params = await searchParams;
+  const nicho = params.nicho as string;
+  const plataforma = params.plataforma as string;
+  const query = params.q as string;
+
+  let title = "Encontre os Melhores Gestores de Tráfego";
+  let description = "Explore nosso marketplace de gestores de tráfego pago. Filtre por nicho, plataforma e veja avaliações reais antes de contratar.";
+
+  if (nicho) {
+    const label = NICHOS.find(n => n.value === nicho)?.label;
+    title = `Gestores de Tráfego para ${label} | TrafegoHub`;
+    description = `Lista atualizada com os melhores gestores de tráfego especialistas em ${label}. Confira portfólios e avaliações.`;
+  } else if (plataforma) {
+    const label = PLATAFORMAS.find(p => p.value === plataforma)?.label;
+    title = `Especialistas em ${label} | TrafegoHub`;
+    description = `Encontre gestores de tráfego certificados em ${label} para escalar seus resultados.`;
+  } else if (query) {
+    title = `Resultados para "${query}" | TrafegoHub`;
+  }
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `${BASE_URL}/gestores`,
+    },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      images: [`${BASE_URL}/og-image.png`],
+    },
+  };
+}
 
 export const dynamic = "force-dynamic";
 
 const ITEMS_PER_PAGE = 12;
 
-export default async function GestoresPage(props: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-  const searchParams = await props.searchParams;
+export default async function GestoresPage({ searchParams }: PageProps) {
+  const params = await searchParams;
   
   // PARAMS
-  const page = Number(searchParams.page) || 1;
-  const query = (searchParams.q as string) || "";
-  const nicho = (searchParams.nicho as string) || "";
-  const plataforma = (searchParams.plataforma as string) || "";
-  const sort = (searchParams.sort as string) || "rating";
+  const page = Number(params.page) || 1;
+  const query = (params.q as string) || "";
+  const nicho = (params.nicho as string) || "";
+  const plataforma = (params.plataforma as string) || "";
+  const sort = (params.sort as string) || "rating";
 
   // WHERE CLAUSE
   const where: any = {};
@@ -72,11 +104,23 @@ export default async function GestoresPage(props: {
       prisma.profile.count({ where }),
     ]);
 
+    // SCHEMA ITEM LIST (Para SEO de listagem)
+    const itemListSchema = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "itemListElement": gestores.map((gestor, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "url": `${BASE_URL}/gestores/${gestor.slug}`
+      }))
+    };
+
     // Serialização
     const gestoresData = JSON.parse(JSON.stringify(gestores));
 
     return (
       <>
+        <JsonLd data={itemListSchema} />
         <Header />
         <main className="flex-1">
           <Suspense fallback={<MarketplaceSkeleton />}>
