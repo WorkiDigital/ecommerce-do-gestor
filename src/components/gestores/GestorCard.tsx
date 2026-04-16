@@ -45,13 +45,16 @@ export default function GestorCard({ gestor }: { gestor: GestorProfile }) {
         {/* Header */}
         <div className="flex items-start gap-4">
           <div className="relative shrink-0">
-            <img
-              src={gestor.avatarUrl}
-              alt={gestor.displayName}
-              width={64}
-              height={64}
-              className="w-16 h-16 rounded-2xl object-cover"
-            />
+            <div className="w-16 h-16 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-800">
+              <Image
+                src={gestor.avatarUrl || "/placeholder-avatar.png"}
+                alt={gestor.displayName}
+                width={64}
+                height={64}
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                sizes="64px"
+              />
+            </div>
             {gestor.isVerified && (
               <span className="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900 grid place-items-center">
                 <Check className="w-2.5 h-2.5 text-white" />

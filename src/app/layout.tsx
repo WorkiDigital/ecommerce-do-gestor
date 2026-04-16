@@ -22,43 +22,45 @@ const BASE_URL = "https://trafegohub.workidigital.tech";
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "TrafegoHub — Encontre o gestor de tráfego certo em 2 minutos",
+    default: "TrafegoHub — Encontre Gestores de Tráfego Verificados",
     template: "%s | TrafegoHub",
   },
   description:
-    "Marketplace que conecta empresas a gestores de tráfego pago com avaliações verificadas, portfólio real e contato direto no WhatsApp.",
+    "A maior plataforma de conexão entre empresas e gestores de tráfego pago do Brasil. Avaliações reais, portfólios verificados e contato direto via WhatsApp.",
   keywords: [
     "gestor de tráfego",
     "tráfego pago",
     "marketing digital",
-    "agência de tráfego",
-    "Meta Ads",
-    "Google Ads",
-    "marketplace",
-    "contratar gestor",
+    "contratar gestor de tráfego",
+    "gestor de facebook ads",
+    "gestor de google ads",
+    "trafegohub",
+    "anúncios online",
   ],
   alternates: {
-    canonical: "./",
-  },
-  verification: {
-    // Espaço para o código do Google Search Console
-    google: "GOOGLE_VERIFICATION_CODE", 
+    canonical: "/",
   },
   openGraph: {
-    title: "TrafegoHub — Encontre o gestor de tráfego certo em 2 minutos",
+    title: "TrafegoHub — Encontre Gestores de Tráfego Verificados",
     description:
-      "Avaliações verificadas, portfólio real e contato direto via WhatsApp. Sem taxa, sem burocracia.",
+      "Conecte-se com os melhores profissionais de tráfego pago do Brasil. Sem intermediários, contato direto no WhatsApp.",
     type: "website",
     locale: "pt_BR",
     siteName: "TrafegoHub",
-    images: [`${BASE_URL}/og-image.png`],
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "TrafegoHub — Marketplace de Gestores de Tráfego",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "TrafegoHub — Encontre o gestor de tráfego certo em 2 minutos",
-    description: "Avaliações verificadas, portfólio real e contato direto via WhatsApp.",
-    creator: "@workidigital",
-    images: [`${BASE_URL}/og-image.png`],
+    title: "TrafegoHub — Encontre Gestores de Tráfego Verificados",
+    description: "Conecte-se com os melhores profissionais de tráfego pago do Brasil. Contato direto via WhatsApp.",
+    images: ["/og-image.png"],
   },
 };
 
