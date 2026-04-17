@@ -73,7 +73,7 @@ export default function HowItWorks() {
                 ))}
               </div>
               <Link
-                href="/cadastrar"
+                href="/login"
                 className="mt-8 inline-flex h-11 px-5 items-center rounded-xl bg-white text-blue-800 font-bold text-sm hover:bg-blue-50 transition"
               >
                 Quero ser encontrado

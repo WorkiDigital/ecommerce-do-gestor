@@ -93,7 +93,7 @@ export default function Pricing() {
                 </ul>
 
                 <Link
-                  href="/cadastrar"
+                  href="/login"
                   className={`mt-8 w-full h-11 grid place-items-center rounded-xl font-semibold transition ${plan.ctaStyle}`}
                 >
                   {plan.cta}

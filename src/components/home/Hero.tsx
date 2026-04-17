@@ -96,7 +96,7 @@ export default function Hero({ totalGestores = 0 }: { totalGestores?: number }) 
               Preciso contratar
             </Link>
             <Link
-              href="/cadastrar"
+              href="/login"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 h-14 rounded-2xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-lg font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition shadow-sm hover:shadow"
             >
               <UserPlus className="w-5 h-5" />

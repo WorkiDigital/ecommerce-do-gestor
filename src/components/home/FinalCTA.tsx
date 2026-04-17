@@ -34,7 +34,7 @@ export default function FinalCTA() {
                 Preciso contratar
               </Link>
               <Link
-                href="/cadastrar"
+                href="/login"
                 className="w-full sm:w-auto h-14 px-8 inline-flex items-center justify-center rounded-2xl bg-white/10 border-2 border-white/15 text-white text-lg font-bold hover:bg-white/15 backdrop-blur transition"
               >
                 Quero ser encontrado

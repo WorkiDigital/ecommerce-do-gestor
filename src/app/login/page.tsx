@@ -52,10 +52,21 @@ export default function LoginPage() {
         const result = await registerUser(formData);
         
         if (result.success) {
-          alert("Conta criada com sucesso! Agora faça o login.");
-          setIsLogin(true);
-          // Limpar apenas as senhas por segurança
-          setFormData(prev => ({ ...prev, password: "", confirmPassword: "" }));
+          // Faz login automaticamente após o cadastro para melhor NX (Navegação/Experiência)
+          const signInResult = await signIn("credentials", {
+            email: formData.email,
+            password: formData.password,
+            redirect: false,
+          });
+
+          if (signInResult?.error) {
+            alert("Conta criada com sucesso! Por favor, faça login.");
+            setIsLogin(true);
+            setFormData(prev => ({ ...prev, password: "", confirmPassword: "" }));
+          } else {
+            router.push("/dashboard");
+            router.refresh();
+          }
         } else {
           alert(result.error || "Erro ao criar conta");
         }
