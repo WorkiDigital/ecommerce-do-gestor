@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Zap, LogOut, AlertCircle, UserCircle } from "lucide-react";
+import { Zap, LogOut, AlertCircle } from "lucide-react";
 import SidebarNav from "@/components/dashboard/SidebarNav";
+import MobileNav from "@/components/dashboard/MobileNav";
 import { signOut, auth } from "@/auth";
 import prisma from "@/lib/prisma";
 
@@ -17,6 +18,7 @@ export default async function DashboardLayout({
     : null;
 
   const isIncomplete = !profile || !profile.bio || profile.niches.length === 0;
+  const isAdmin = session?.user?.role === "ADMIN" || session?.user?.email === "workidigitaloficial@gmail.com";
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col md:flex-row">
@@ -33,7 +35,7 @@ export default async function DashboardLayout({
           </Link>
         </div>
 
-        <SidebarNav isAdmin={session?.user?.role === "ADMIN" || session?.user?.email === "workidigitaloficial@gmail.com"} />
+        <SidebarNav isAdmin={isAdmin} />
 
         <div className="p-4 border-t border-slate-200 dark:border-slate-800">
           <form action={async () => {
@@ -48,32 +50,24 @@ export default async function DashboardLayout({
         </div>
       </aside>
 
-      {/* Mobile Topbar */}
-      <div className="md:hidden sticky top-0 z-10 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 h-16 flex items-center px-4 justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-blue-600 flex items-center justify-center">
-            <Zap className="w-4 h-4 text-white" />
-          </div>
-          <span className="font-[family-name:var(--font-outfit)] text-lg font-bold tracking-tight text-slate-900 dark:text-white">
-            TrafegoHub
-          </span>
-        </Link>
-        <button className="w-8 h-8 grid place-items-center rounded-lg bg-slate-100 dark:bg-slate-800">
-          <UserCircle className="w-5 h-5" />
-        </button>
-      </div>
+      {/* Mobile Navigation (Top bar + Bottom bar + Drawer) */}
+      <MobileNav
+        isAdmin={isAdmin}
+        userName={session?.user?.name || undefined}
+        userEmail={session?.user?.email || undefined}
+      />
 
       {/* Main Content Area */}
-      <main className="flex-1 md:pl-64 flex flex-col">
+      <main className="flex-1 md:pl-64 flex flex-col pb-20 md:pb-0">
         {isIncomplete && (
-          <div className="bg-amber-50 dark:bg-amber-900/10 border-b border-amber-200 dark:border-amber-800/50 px-6 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="bg-amber-50 dark:bg-amber-900/10 border-b border-amber-200 dark:border-amber-800/50 px-4 sm:px-6 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 text-amber-800 dark:text-amber-400 text-sm">
-              <AlertCircle className="w-4 h-4" />
+              <AlertCircle className="w-4 h-4 shrink-0" />
               <p>Seu perfil está incompleto e não aparecerá nos resultados de busca.</p>
             </div>
             <Link 
               href="/dashboard/perfil" 
-              className="text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300 hover:underline"
+              className="text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300 hover:underline whitespace-nowrap"
             >
               Completar Agora
             </Link>

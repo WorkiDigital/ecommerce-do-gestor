@@ -8,7 +8,10 @@
       "Bash(npm install *)",
       "Bash(npm run *)",
       "Bash(npx prisma *)",
-      "Bash(node -e \"const lc = require\\('lightningcss'\\); console.log\\(lc.version || 'ok'\\)\")"
+      "Bash(node -e \"const lc = require\\('lightningcss'\\); console.log\\(lc.version || 'ok'\\)\")",
+      "Bash(npx tsc *)",
+      "Bash(git push *)",
+      "Bash(git revert *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Samsung\\ecommer-do-gestor\\src\\app\\api"
