@@ -25,6 +25,7 @@
 
 ## 📝 Estado Atual & Regras
 *   **Melhorias Recentes**:
+    *   **Otimização Mobile do Dashboard**: Implementada navegação por Bottom Tab Bar e Drawer lateral (`MobileNav`). Adicionada barra "Save" fixa (sticky) no rodapé e "Visão de Prévia" via Modal na página de Perfil (`ProfileForm`). Layout do portfólio ajustado com cards responsivos no `PortfolioManager`. Melhor uso do espaço no mobile (`px-4`, espaçamentos compactos).
     *   **Paginação & Escalabilidade**: Marketplace refatorado para Server-Side (Prisma `skip`/`take`). Navegação via URL (`?page=X`) com componente de paginação dedicado.
     *   **Filtros no Banco**: Busca, Nicho e Plataforma agora são processados via Query SQL, não mais no cliente.
     *   **Hero Section**: Animações de borda rítmicas e botão de busca mobile otimizado.
