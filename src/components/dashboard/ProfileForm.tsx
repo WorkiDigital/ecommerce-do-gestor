@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createProfile } from "@/app/actions/profile";
 import { NICHOS, PLATAFORMAS, ESTADOS_BR } from "@/lib/constants";
-import { User, MapPin, Briefcase, Globe, MessageSquare, Save, Loader2, DollarSign, Upload } from "lucide-react";
+import { User, MapPin, Briefcase, Globe, MessageSquare, Save, Loader2, DollarSign, Upload, Eye, X } from "lucide-react";
 import { UploadButton } from "@/lib/uploadthing";
 import GestorCard from "@/components/gestores/GestorCard";
 
@@ -48,6 +48,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
     reviewCount: initialData?.reviewCount || 0,
     badge: initialData?.badge || "NOVO",
   });
+  const [showMobilePreview, setShowMobilePreview] = useState(false);
 
   const handleToggleArray = (field: "niches" | "platforms", value: string) => {
     setFormData((prev) => ({
@@ -124,7 +125,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center gap-2 px-6 py-2.5 bg-slate-900 dark:bg-violet-600 hover:bg-slate-800 dark:hover:bg-violet-700 disabled:opacity-50 text-white text-sm font-bold rounded-xl shadow-lg transition-all scale-100 hover:scale-[1.02] active:scale-[0.98] shrink-0"
+            className="hidden sm:flex items-center gap-2 px-6 py-2.5 bg-slate-900 dark:bg-violet-600 hover:bg-slate-800 dark:hover:bg-violet-700 disabled:opacity-50 text-white text-sm font-bold rounded-xl shadow-lg transition-all scale-100 hover:scale-[1.02] active:scale-[0.98] shrink-0"
           >
             {loading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -136,7 +137,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
         </div>
 
         {/* Tab Content */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[32px] p-8 shadow-sm">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[28px] sm:rounded-[32px] p-5 sm:p-8 shadow-sm">
           {activeTab === "basic" && (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
               <div className="flex flex-col md:flex-row gap-8 items-center p-6 bg-slate-50 dark:bg-slate-950/50 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
@@ -351,7 +352,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
       </form>
 
       {/* Coluna da Prévia */}
-      <aside className="lg:w-[400px] w-full space-y-6 lg:sticky lg:top-24">
+      <aside className="hidden lg:block lg:w-[400px] w-full space-y-6 lg:sticky lg:top-24">
         <div className="flex items-center justify-between px-2">
           <h4 className="text-xs uppercase font-black text-slate-400 tracking-widest">Prévia no Marketplace</h4>
           <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -368,6 +369,51 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
           </p>
         </div>
       </aside>
+
+      {/* Floating Action Buttons & Modal (Mobile Only) */}
+      <div className="lg:hidden">
+        {/* Sticky Save Bar */}
+        <div className="fixed bottom-[72px] left-0 right-0 z-40 px-4 py-3 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-t border-slate-200/60 dark:border-slate-800/60 flex items-center justify-between gap-4 animate-in slide-in-from-bottom-full">
+            <button
+               type="button"
+               onClick={() => setShowMobilePreview(true)}
+               className="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl border border-slate-200 dark:border-slate-700 font-bold text-xs text-slate-600 dark:text-slate-400"
+            >
+               <Eye className="w-4 h-4" /> VER PRÉVIA
+            </button>
+            <button
+                type="submit"
+                form={undefined} 
+                onClick={(e) => {
+                    const form = document.querySelector('form');
+                    if (form) form.requestSubmit();
+                }}
+                disabled={loading}
+                className="flex-1 flex items-center justify-center gap-2 h-11 bg-violet-600 text-white rounded-xl font-bold text-xs shadow-lg shadow-violet-600/20 disabled:opacity-50"
+            >
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                SALVAR
+            </button>
+        </div>
+
+        {/* Preview Modal */}
+        {showMobilePreview && (
+            <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                <div className="w-full max-w-sm relative animate-in zoom-in-95 duration-200">
+                    <button 
+                        onClick={() => setShowMobilePreview(false)}
+                        className="absolute -top-12 right-0 w-10 h-10 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center shadow-lg"
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl overflow-hidden pointer-events-none">
+                      <GestorCard gestor={formData as any} />
+                    </div>
+                </div>
+                <div className="absolute inset-0 -z-10" onClick={() => setShowMobilePreview(false)} />
+            </div>
+        )}
+      </div>
     </div>
   );
 }

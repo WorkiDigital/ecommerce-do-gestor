@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Plus, Trash2, Loader2, Image as ImageIcon, TrendingUp, DollarSign, Target, Upload } from "lucide-react";
 import { addPortfolioItem, deletePortfolioItem } from "@/app/actions/portfolio";
 import { UploadButton } from "@/lib/uploadthing";
@@ -19,6 +20,7 @@ interface PortfolioManagerProps {
 }
 
 export default function PortfolioManager({ items: initialItems }: PortfolioManagerProps) {
+  const router = useRouter();
   const [items, setItems] = useState(initialItems);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -50,9 +52,16 @@ export default function PortfolioManager({ items: initialItems }: PortfolioManag
     });
 
     if (result.success) {
-      // For simplicity, we refresh the page to get the updated list, 
-      // but in a real app we'd update state or use optimistic updates.
-      window.location.reload();
+      setShowForm(false);
+      setFormData({
+        title: "",
+        description: "",
+        imageUrl: "",
+        roas: "",
+        cpl: "",
+        investment: ""
+      });
+      router.refresh();
     } else {
       alert(result.error);
     }
@@ -72,29 +81,29 @@ export default function PortfolioManager({ items: initialItems }: PortfolioManag
 
   return (
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
-      <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+      <div className="p-4 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-4">
         <div>
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-violet-600" />
-            Casos de Sucesso / Portfólio
+            Portfólio de Resultados
           </h3>
-          <p className="text-sm text-slate-500">Mostre seus melhores resultados para atrair clientes.</p>
+          <p className="text-xs sm:text-sm text-slate-500">Seus cases de sucesso.</p>
         </div>
         {!showForm && (
           <button
             onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-violet-600 text-white rounded-xl text-sm font-semibold hover:bg-violet-700 transition"
+            className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-violet-600 text-white rounded-xl text-xs sm:text-sm font-semibold hover:bg-violet-700 transition shrink-0"
           >
             <Plus className="w-4 h-4" />
-            Adicionar Case
+            Adicionar
           </button>
         )}
       </div>
 
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         {showForm && (
-          <div className="mb-8 p-6 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 animate-in fade-in slide-in-from-top-4">
-            <h4 className="font-bold mb-4">Novo Caso de Sucesso</h4>
+          <div className="mb-6 p-4 sm:p-6 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 animate-in fade-in slide-in-from-top-4">
+            <h4 className="font-bold mb-4 text-sm sm:text-base">Novo Caso de Sucesso</h4>
             <form onSubmit={handleAdd} className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -154,9 +163,9 @@ export default function PortfolioManager({ items: initialItems }: PortfolioManag
                 />
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 xs:grid-cols-3 gap-3 sm:gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium flex items-center gap-1">
+                  <label className="text-xs font-medium flex items-center gap-1">
                     <TrendingUp className="w-3 h-3 text-emerald-500" /> ROAS
                   </label>
                   <input
@@ -164,11 +173,11 @@ export default function PortfolioManager({ items: initialItems }: PortfolioManag
                     value={formData.roas}
                     onChange={e => setFormData({ ...formData, roas: e.target.value })}
                     placeholder="Ex: 8.5x"
-                    className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 outline-none focus:ring-2 focus:ring-violet-500"
+                    className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 outline-none focus:ring-2 focus:ring-violet-500 text-sm"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium flex items-center gap-1">
+                  <label className="text-xs font-medium flex items-center gap-1">
                     <Target className="w-3 h-3 text-blue-500" /> CPL
                   </label>
                   <input
@@ -176,11 +185,11 @@ export default function PortfolioManager({ items: initialItems }: PortfolioManag
                     value={formData.cpl}
                     onChange={e => setFormData({ ...formData, cpl: e.target.value })}
                     placeholder="Ex: R$ 2,50"
-                    className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 outline-none focus:ring-2 focus:ring-violet-500"
+                    className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 outline-none focus:ring-2 focus:ring-violet-500 text-sm"
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium flex items-center gap-1">
+                <div className="space-y-2 col-span-2 xs:col-span-1">
+                  <label className="text-xs font-medium flex items-center gap-1">
                     <DollarSign className="w-3 h-3 text-amber-500" /> Investido
                   </label>
                   <input
@@ -188,7 +197,7 @@ export default function PortfolioManager({ items: initialItems }: PortfolioManag
                     value={formData.investment}
                     onChange={e => setFormData({ ...formData, investment: e.target.value })}
                     placeholder="Ex: R$ 10k"
-                    className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 outline-none focus:ring-2 focus:ring-violet-500"
+                    className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 outline-none focus:ring-2 focus:ring-violet-500 text-sm"
                   />
                 </div>
               </div>
