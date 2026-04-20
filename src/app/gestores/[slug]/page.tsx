@@ -12,7 +12,7 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-export const revalidate = 3600; // Cache individual de cada perfil dura 1 hora
+export const dynamic = "force-dynamic";
 
 const BASE_URL = "https://trafegohub.workidigital.tech";
 

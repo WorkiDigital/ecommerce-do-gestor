@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 
-export const revalidate = 86400; // Cache de 1 dia
+export const dynamic = "force-dynamic";
 
 export default function robots(): MetadataRoute.Robots {
   return {

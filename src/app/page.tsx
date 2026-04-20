@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description: "Conecte sua empresa aos melhores gestores de tráfego especializados em Facebook Ads, Google Ads e muito mais. Avaliações verificadas e contato direto.",
 };
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   let featuredGestores: any[] = [];
