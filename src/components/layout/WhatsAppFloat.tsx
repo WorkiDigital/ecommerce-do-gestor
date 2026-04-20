@@ -1,9 +1,11 @@
 import { MessageCircle } from "lucide-react";
 
 export default function WhatsAppFloat() {
+  const supportNumber = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP || "5511999999999";
+  
   return (
     <a
-      href="https://wa.me/5511999999999"
+      href={`https://wa.me/${supportNumber}`}
       target="_blank"
       rel="noopener noreferrer"
       className="fixed bottom-5 right-5 z-50 w-14 h-14 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] text-white grid place-items-center shadow-2xl shadow-green-600/30 hover:scale-105 transition-all"

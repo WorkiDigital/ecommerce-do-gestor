@@ -24,9 +24,9 @@ export default function HowItWorks() {
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-700 dark:text-blue-300 text-xs font-semibold">
                 Para Empresas
               </div>
-              <h3 className="mt-4 font-[family-name:var(--font-outfit)] text-[28px] font-bold text-slate-900 dark:text-white">
+              <h2 className="mt-4 font-[family-name:var(--font-outfit)] text-[28px] font-bold text-slate-900 dark:text-white">
                 Contrate em 3 passos
-              </h3>
+              </h2>
               <div className="mt-8 space-y-6">
                 {empresaSteps.map((step, i) => (
                   <div key={i} className="flex gap-4">
@@ -56,9 +56,9 @@ export default function HowItWorks() {
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-white text-xs font-semibold backdrop-blur">
                 Para Gestores
               </div>
-              <h3 className="mt-4 font-[family-name:var(--font-outfit)] text-[28px] font-bold">
+              <h2 className="mt-4 font-[family-name:var(--font-outfit)] text-[28px] font-bold">
                 Seja encontrado todos os dias
-              </h3>
+              </h2>
               <div className="mt-8 space-y-6">
                 {gestorSteps.map((step, i) => (
                   <div key={i} className="flex gap-4">

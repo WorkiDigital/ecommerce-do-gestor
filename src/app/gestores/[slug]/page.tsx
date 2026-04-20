@@ -12,7 +12,7 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600; // Cache individual de cada perfil dura 1 hora
 
 const BASE_URL = "https://trafegohub.workidigital.tech";
 
@@ -53,6 +53,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       images: gestor.avatarUrl ? [gestor.avatarUrl] : [`${BASE_URL}/og-image.png`],
     },
   };
+}
+
+export async function generateStaticParams() {
+  // Pré-gera estaticamente os 20 gestores mais bem avaliados no momento do build
+  const topGestores = await prisma.profile.findMany({
+    where: { isActive: true },
+    orderBy: { avgRating: "desc" },
+    take: 20,
+    select: { slug: true }
+  });
+
+  return topGestores.map((gestor) => ({
+    slug: gestor.slug,
+  }));
 }
 
 export default async function GestorPage({ params }: PageProps) {

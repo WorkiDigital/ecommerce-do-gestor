@@ -1,4 +1,3 @@
-"use client";
 
 import Link from "next/link";
 import { Zap } from "lucide-react";
@@ -20,9 +19,9 @@ export default function FinalCTA() {
               <Zap className="w-7 h-7 text-white" />
             </div>
 
-            <h3 className="font-[family-name:var(--font-outfit)] text-3xl sm:text-4xl font-bold text-white">
+            <h2 className="font-[family-name:var(--font-outfit)] text-3xl sm:text-4xl font-bold text-white">
               Pronto para crescer com tráfego pago?
-            </h3>
+            </h2>
             <p className="mt-3 text-slate-400 max-w-xl mx-auto">
               Empresas encontram o gestor ideal em minutos. Gestores recebem clientes todos os dias.
             </p>

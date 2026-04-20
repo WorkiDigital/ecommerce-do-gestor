@@ -90,6 +90,7 @@ export default function Hero({ totalGestores = 0 }: { totalGestores?: number }) 
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/gestores"
+              aria-label="Ir para a página de busca de gestores"
               className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 h-14 rounded-2xl bg-gradient-to-r from-blue-700 to-indigo-700 dark:from-violet-600 dark:to-blue-600 text-white text-lg font-semibold shadow-xl shadow-indigo-600/20 hover:shadow-2xl hover:shadow-indigo-600/30 hover:-translate-y-1 transition-all"
             >
               <Search className="w-5 h-5" />
@@ -97,6 +98,7 @@ export default function Hero({ totalGestores = 0 }: { totalGestores?: number }) 
             </Link>
             <Link
               href="/login"
+              aria-label="Acessar painel para criar perfil de gestor público"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 h-14 rounded-2xl bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-lg font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition shadow-sm hover:shadow"
             >
               <UserPlus className="w-5 h-5" />
@@ -147,6 +149,7 @@ export default function Hero({ totalGestores = 0 }: { totalGestores?: number }) 
                   </div>
                   <button
                     type="submit"
+                    aria-label="Buscar gestor pela palavra-chave informada"
                     className="w-full sm:w-auto h-14 px-10 rounded-2xl bg-gradient-to-r from-blue-700 to-indigo-700 text-white font-bold text-[17px] shadow-lg shadow-blue-700/20 hover:shadow-xl hover:shadow-blue-700/30 active:scale-[0.98] transition-all"
                   >
                     Buscar gestores
@@ -160,6 +163,7 @@ export default function Hero({ totalGestores = 0 }: { totalGestores?: number }) 
               {quickFilters.map((filter) => (
                 <button
                   key={filter}
+                  aria-label={`Aplicar filtro rápido para nicho de ${filter}`}
                   onClick={() => router.push(`/gestores?q=${encodeURIComponent(filter)}`)}
                   className="px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-violet-100 dark:hover:bg-violet-900/30 hover:text-violet-700 dark:hover:text-violet-300 transition"
                 >

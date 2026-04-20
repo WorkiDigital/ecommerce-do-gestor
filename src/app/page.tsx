@@ -6,6 +6,8 @@ import Features from "@/components/home/Features";
 import HowItWorks from "@/components/home/HowItWorks";
 import FeaturedGestores from "@/components/home/FeaturedGestores";
 import Pricing from "@/components/home/Pricing";
+import Testimonials from "@/components/home/Testimonials";
+import FAQ from "@/components/home/FAQ";
 import FinalCTA from "@/components/home/FinalCTA";
 import prisma from "@/lib/prisma";
 import type { Metadata } from "next";
@@ -15,7 +17,7 @@ export const metadata: Metadata = {
   description: "Conecte sua empresa aos melhores gestores de tráfego especializados em Facebook Ads, Google Ads e muito mais. Avaliações verificadas e contato direto.",
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function Home() {
   let featuredGestores: any[] = [];
@@ -45,7 +47,9 @@ export default async function Home() {
         <Features />
         <HowItWorks />
         <FeaturedGestores initialGestores={gestoresData} />
+        <Testimonials />
         <Pricing />
+        <FAQ />
         <FinalCTA />
       </main>
       <Footer />

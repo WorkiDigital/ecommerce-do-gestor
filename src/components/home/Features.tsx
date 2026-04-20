@@ -38,7 +38,7 @@ export default function Features() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl">
           <h2 className="font-[family-name:var(--font-outfit)] text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
-            Tudo que você precisa, sem enrolação
+            Benefícios de contratar o seu gestor de tráfego aqui
           </h2>
           <p className="mt-4 text-lg text-slate-700 dark:text-slate-400 font-medium">
             Criamos o TrafegoHub para acabar com indicações às cegas.
