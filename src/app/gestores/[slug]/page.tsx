@@ -58,7 +58,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export async function generateStaticParams() {
   // Pré-gera estaticamente os 20 gestores mais bem avaliados no momento do build
   const topGestores = await prisma.profile.findMany({
-    where: { isActive: true },
+    where: { user: { status: "ACTIVE" } },
     orderBy: { avgRating: "desc" },
     take: 20,
     select: { slug: true }
