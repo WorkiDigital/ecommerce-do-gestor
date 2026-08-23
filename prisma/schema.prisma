@@ -144,3 +144,148 @@ model PortfolioItem {
   
   createdAt   DateTime @default(now())
 }
+
+// --- Analytics & Ads Management Models ---
+
+enum PlatformType {
+  META_ADS
+  GOOGLE_ADS
+  TIKTOK_ADS
+  ORGANIC
+}
+
+enum LeadStatus {
+  NOVO_LEAD
+  EM_ATENDIMENTO
+  QUALIFICADO
+  PROPOSTA_ENVIADA
+  VENDA_CONCLUIDA
+  PERDIDO_DESQUALIFICADO
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  CAROUSEL
+}
+
+model AdAccount {
+  id          String   @id @default(cuid())
+  name        String
+  clientName  String
+  platform    PlatformType
+  externalId  String?  // ID da conta de anúncios
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  campaigns   Campaign[]
+  leads       AdLead[]
+  savedViews  SavedView[]
+}
+
+model Campaign {
+  id          String   @id @default(cuid())
+  accountId   String
+  account     AdAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  externalId  String   // ID na Meta/Google
+  name        String
+  status      String   // ACTIVE, PAUSED, etc.
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  adSets      AdSet[]
+  
+  @@index([accountId, externalId])
+}
+
+model AdSet {
+  id          String   @id @default(cuid())
+  campaignId  String
+  campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  externalId  String
+  name        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  ads         Ad[]
+  
+  @@index([campaignId, externalId])
+}
+
+model Ad {
+  id            String    @id @default(cuid())
+  adSetId       String
+  adSet         AdSet     @relation(fields: [adSetId], references: [id], onDelete: Cascade)
+  externalId    String
+  name          String
+  mediaType     MediaType?
+  creativeUrl   String?
+  thumbnailUrl  String?
+  hookCategory  String?   // Ex: "Dor", "Benefício", "Prova Social"
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  leads         AdLead[]
+  
+  @@index([adSetId, externalId])
+}
+
+model AdLead {
+  id              String      @id @default(cuid())
+  accountId       String
+  account         AdAccount   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  adId            String?
+  ad              Ad?         @relation(fields: [adId], references: [id], onDelete: SetNull)
+  
+  // Dados do Contato
+  name            String?
+  phone           String
+  city            String?
+  state           String?
+  country         String?     @default("BR")
+  
+  // Parâmetros de Rastreamento (UTMs e IDs)
+  utmSource       String?
+  utmMedium       String?
+  utmCampaign     String?
+  utmContent      String?
+  utmTerm         String?
+  sourceId        String?     // Identificador único da fonte
+  pageId          String?     // ID da página/perfil
+  ctwAciId        String?     // Click-to-WhatsApp Ad Click ID
+  pixelId         String?
+  eventSourceUrl  String?
+  instanceName    String?     // Instância WhatsApp (ex: Evolution API)
+  
+  // Status do Funil Comercial
+  status          LeadStatus  @default(NOVO_LEAD)
+  saleValue       Decimal?    @db.Decimal(10, 2)
+  saleDate        DateTime?
+  
+  // Metadados
+  firstMessage    String?     @db.Text
+  capiSynced      Boolean     @default(false)
+  capiSyncedAt    DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  @@index([accountId, status, createdAt])
+  @@index([utmCampaign, utmContent])
+  @@index([ctwAciId])
+  @@index([phone])
+}
+
+model SavedView {
+  id          String   @id @default(cuid())
+  accountId   String?
+  account     AdAccount? @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  userId      String
+  name        String
+  description String?
+  filterState Json     // Estrutura serializada dos filtros e colunas
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([userId, accountId])
+}
