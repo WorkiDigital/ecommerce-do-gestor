@@ -51,6 +51,12 @@ export default function MobileNav({ isAdmin, userName, userEmail }: MobileNavPro
       active: pathname === "/dashboard",
     },
     {
+      href: "/dashboard/analytics",
+      label: "Tráfego",
+      icon: LayoutDashboard,
+      active: pathname === "/dashboard/analytics",
+    },
+    {
       href: "/dashboard/perfil",
       label: "Perfil",
       icon: UserCircle,
@@ -70,6 +76,12 @@ export default function MobileNav({ isAdmin, userName, userEmail }: MobileNavPro
       label: "Visão Geral",
       icon: LayoutDashboard,
       active: pathname === "/dashboard",
+    },
+    {
+      href: "/dashboard/analytics",
+      label: "Gestão de Tráfego",
+      icon: LayoutDashboard,
+      active: pathname === "/dashboard/analytics",
     },
     {
       href: "/dashboard/perfil",

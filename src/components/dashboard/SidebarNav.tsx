@@ -7,7 +7,8 @@ import {
   UserCircle, 
   Settings, 
   Users, 
-  ShieldCheck 
+  ShieldCheck,
+  BarChart3
 } from "lucide-react";
 
 interface SidebarNavProps {
@@ -23,6 +24,12 @@ export default function SidebarNav({ isAdmin }: SidebarNavProps) {
       label: "Visão Geral",
       icon: LayoutDashboard,
       active: pathname === "/dashboard",
+    },
+    {
+      href: "/dashboard/analytics",
+      label: "Gestão de Tráfego",
+      icon: BarChart3,
+      active: pathname === "/dashboard/analytics",
     },
     {
       href: "/dashboard/perfil",
